@@ -26,6 +26,13 @@ Have you found a bug or have a suggestion or improvement you'd like to submit? T
 1. Activate the plugin
 2. Go to Tools > Transients
 
+= How do I Show My Shopping Cart? =
+
+_Does this work with sites that use object caching?_
+
+Not at this time, it only works when transients are stored in the options table.
+
+
 == Changelog ==
 
 = 1.0 =
