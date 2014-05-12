@@ -375,8 +375,12 @@ class PW_Transients_Manager {
 	*/
 	private function get_transient_expiration( $transient ) {
 
-		$exp = get_option( '_transient_timeout_' . $this->get_transient_name( $transient ) );
-		return human_time_diff( current_time( 'timestamp' ), $exp );
+		$time_now   = current_time( 'timestamp' );
+		$expiration = $this->get_transient_expiration_time( $transient );
+		if( $time_now > $expiration ) {
+			return __( 'Expired', 'pw-transients-manager' );
+		}
+		return human_time_diff( $time_now, $expiration );
 
 	}
 
