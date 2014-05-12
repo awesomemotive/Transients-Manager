@@ -325,7 +325,7 @@ class PW_Transients_Manager {
 	 * @since   1.0
 	*/
 	private function get_transient_name( $transient ) {
-		return str_replace( '_transient_', '', $transient->option_name );
+		return substr( $transient->option_name, 11, strlen( $transient->option_name ) );
 	}
 
 	/**
