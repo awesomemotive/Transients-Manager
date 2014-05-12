@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Transients Manager\n"
-"POT-Creation-Date: 2014-05-12 09:02-0500\n"
-"PO-Revision-Date: 2014-05-12 09:02-0500\n"
+"POT-Creation-Date: 2014-05-12 11:10-0500\n"
+"PO-Revision-Date: 2014-05-12 11:10-0500\n"
 "Last-Translator: Chris Christoff <chriscct7@gmail.com>\n"
 "Language-Team: Chris Christoff <chriscct7@gmail.com>\n"
 "Language: en\n"
@@ -75,4 +75,8 @@ msgstr ""
 
 #: transients-manager.php:194
 msgid "No transients found"
+msgstr ""
+
+#: transients-manager.php:381
+msgid "Expired"
 msgstr ""
