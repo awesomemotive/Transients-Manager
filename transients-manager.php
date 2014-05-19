@@ -234,7 +234,7 @@ class PW_Transients_Manager {
 
 		if( false === $transients ) {
 
-			$sql = "SELECT * FROM $wpdb->options WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout%'";
+			$sql = "SELECT * FROM $wpdb->options WHERE option_name LIKE '\_transient\_%' AND option_name NOT LIKE '\_transient\_timeout%'";
 
 			if( ! empty( $args['search'] ) ) {
 
@@ -276,7 +276,7 @@ class PW_Transients_Manager {
 
 			if( false === $count ) {
 				$search     = esc_sql( $search );
-				$count = $wpdb->get_var( "SELECT count(option_id) FROM $wpdb->options WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout%' AND option_name LIKE '%{$search}%'" );
+				$count = $wpdb->get_var( "SELECT count(option_id) FROM $wpdb->options WHERE option_name LIKE '\_transient\_%' AND option_name NOT LIKE '\_transient\_timeout%' AND option_name LIKE '%{$search}%'" );
 				wp_cache_set( 'pw_transients_' . sanitize_key( $search ), $count, '', 3600 );
 			}
 
@@ -286,7 +286,7 @@ class PW_Transients_Manager {
 
 			if( false === $count ) {
 
-				$count = $wpdb->get_var( "SELECT count(option_id) FROM $wpdb->options WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout%'" );
+				$count = $wpdb->get_var( "SELECT count(option_id) FROM $wpdb->options WHERE option_name LIKE '\_transient\_%' AND option_name NOT LIKE '\_transient\_timeout%'" );
 				wp_cache_set( 'pw_transients_count', $count, '', 3600 );
 			}
 
