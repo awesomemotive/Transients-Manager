@@ -134,7 +134,7 @@ class PW_Transients_Manager {
 								<td><textarea class="large-text" name="value" rows="10" cols="50"><?php echo $transient->option_value; ?></textarea></td>
 							</tr>
 					</table>
-					<input type="hidden" name="transient" value="<?php echo esc_attr( $this->get_transient_name( $transient ) ); ?>"/>
+					<input type="hidden" name="transient" value="<?php echo $this->get_transient_name( $transient ); ?>"/>
 					<input type="hidden" name="action" value="update_transient"/>
 					<?php wp_nonce_field( 'transient_manager' ); ?>
 					<?php submit_button(); ?>
