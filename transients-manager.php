@@ -382,7 +382,7 @@ class PW_Transients_Manager {
 	*/
 	private function get_transient_expiration( $transient ) {
 
-		$time_now   = current_time( 'timestamp' );
+		$time_now   = time();
 		$expiration = $this->get_transient_expiration_time( $transient );
 
 		if( empty( $expiration ) ) {
@@ -472,7 +472,7 @@ class PW_Transients_Manager {
 
 		global $wpdb;
 
-		$time_now = current_time( 'timestamp' );
+		$time_now = time();
 		$expired  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '_transient_timeout_%' AND option_value+0 < $time_now" );
 
 		if( empty( $expired ) ) {
@@ -505,7 +505,7 @@ class PW_Transients_Manager {
 
 		$value      = sanitize_text_field( $_POST['value'] );
 		$expiration = sanitize_text_field( $_POST['expires'] );
-		$expiration = $expiration - current_time( 'timestamp' );
+		$expiration = $expiration - time();
 
 		return set_transient( $transient, $value, $expiration );
 
