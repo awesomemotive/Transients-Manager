@@ -6,7 +6,7 @@ Donate link: http://pippinsplugins.com/support-the-site
 Tags: transients
 Requires at least: 3.6
 Tested up to: 4.0
-Stable Tag: 1.0.1
+Stable Tag: 1.1
 
 Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
 
@@ -34,6 +34,12 @@ Not at this time, it only works when transients are stored in the options table.
 
 
 == Changelog ==
+
+= 1.1 =
+
+* New: Added support for deleting expired transients in bulk
+* Fix: Bug with how the transient expiration date is determined
+* Fix: Bug with how the expiration date is shown for transients that don't have an expiration date
 
 = 1.0.1 =
 
