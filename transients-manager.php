@@ -144,6 +144,13 @@ class PW_Transients_Manager {
 
 				<h2><?php _e( 'Transients', 'pw-transients-manager' ); ?></h2>
 
+				<form method="post" class="alignleft">
+					<input type="hidden" name="action" value="delete_expired_transients" />
+					<input type="hidden" name="transient" value="all" />
+					<?php wp_nonce_field( 'transient_manager' ); ?>
+					<input type="submit" class="button secondary" value="<?php _e( 'Delete Expired Transients', 'pw-transients-manager' ); ?>" />
+				</form>
+
 				<form method="get">
 					<p class="search-box">
 						<input type="hidden" name="page" value="pw-transients-manager"/>
@@ -423,8 +430,12 @@ class PW_Transients_Manager {
 				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager&s=' . $search ) ); exit;
 				break;
 
-		}
+			case 'delete_expired_transients' :
+				$this->delete_expired_transients();
+				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager' ) ); exit;
+				break;
 
+		}
 
 	}
 
@@ -442,6 +453,35 @@ class PW_Transients_Manager {
 		}
 
 		return delete_transient( $transient );
+
+	}
+
+	/**
+	 * Delete all expired transients
+	 *
+	 * @access  private
+	 * @return  bool
+	 * @since   1.1
+	*/
+	private function delete_expired_transients() {
+
+		global $wpdb;
+
+		$time_now = current_time( 'timestamp' );
+		$expired  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '_transient_timeout_%' AND option_value+0 < $time_now" );
+
+		if( empty( $expired ) ) {
+			return false;
+		}
+
+		foreach( $expired as $transient ) {
+
+			$name = str_replace( '_transient_timeout_', '', $transient );
+			delete_transient( $name );
+
+		}
+
+		return true;
 
 	}
 
