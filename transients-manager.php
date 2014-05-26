@@ -384,6 +384,11 @@ class PW_Transients_Manager {
 
 		$time_now   = current_time( 'timestamp' );
 		$expiration = $this->get_transient_expiration_time( $transient );
+
+		if( empty( $expiration ) ) {
+			return __( 'Does not expire', 'pw-transients-manager' );
+		}
+
 		if( $time_now > $expiration ) {
 			return __( 'Expired', 'pw-transients-manager' );
 		}
