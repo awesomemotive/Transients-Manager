@@ -160,6 +160,13 @@ class PW_Transients_Manager {
 					</p>
 				</form>
 
+				<form method="post" class="alignleft">
+					<input type="hidden" name="action" value="delete_transients_that_will_expire" />
+					<input type="hidden" name="transient" value="all" />
+					<?php wp_nonce_field( 'transient_manager' ); ?>
+					<input type="submit" class="button secondary" value="<?php _e( 'Delete Transients That Will Expire', 'pw-transients-manager' ); ?>" />
+				</form>
+
 				<div class="tablenav top">
 					<div class="tablenav-pages">
 						<span class="displaying-num"><?php printf( _n( '%d Transient', '%d Transients', $count, 'pw-transients-manager' ), $count ); ?></span>
@@ -440,6 +447,11 @@ class PW_Transients_Manager {
 				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager' ) ); exit;
 				break;
 
+			case 'delete_transients_that_will_expire' :
+				$this->delete_transients_that_will_expire();
+				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager' ) ); exit;
+				break;
+
 		}
 
 	}
@@ -480,6 +492,35 @@ class PW_Transients_Manager {
 		}
 
 		foreach( $expired as $transient ) {
+
+			$name = str_replace( '_transient_timeout_', '', $transient );
+			delete_transient( $name );
+
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * Delete all transients with expiration
+	 *
+	 * @access  private
+	 * @return  bool
+	 * @since   
+	*/
+	private function delete_transients_that_will_expire() {
+
+		global $wpdb;
+
+		$time_now = time();
+		$will_expire  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '_transient_timeout_%'" );
+
+		if( empty( $will_expire ) ) {
+			return false;
+		}
+
+		foreach( $will_expire as $transient ) {
 
 			$name = str_replace( '_transient_timeout_', '', $transient );
 			delete_transient( $name );
