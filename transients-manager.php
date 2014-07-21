@@ -151,6 +151,13 @@ class PW_Transients_Manager {
 					<input type="submit" class="button secondary" value="<?php _e( 'Delete Expired Transients', 'pw-transients-manager' ); ?>" />
 				</form>
 
+				<form method="post" class="alignleft">&nbsp;
+					<input type="hidden" name="action" value="delete_transients_with_expiration" />
+					<input type="hidden" name="transient" value="all" />
+					<?php wp_nonce_field( 'transient_manager' ); ?>
+					<input type="submit" class="button secondary" value="<?php _e( 'Delete Transients with an Expiration', 'pw-transients-manager' ); ?>" />
+				</form>
+
 				<form method="get">
 					<p class="search-box">
 						<input type="hidden" name="page" value="pw-transients-manager"/>
@@ -158,13 +165,6 @@ class PW_Transients_Manager {
 						<input type="search" id="transient-search-input" name="s" value="<?php echo esc_attr( $search ); ?>"/>
 						<input type="submit" class="button-secondary" value="<?php _e( 'Search Transients', 'pw-transients-manager' ); ?>"/>
 					</p>
-				</form>
-
-				<form method="post" class="alignleft">
-					<input type="hidden" name="action" value="delete_transients_that_will_expire" />
-					<input type="hidden" name="transient" value="all" />
-					<?php wp_nonce_field( 'transient_manager' ); ?>
-					<input type="submit" class="button secondary" value="<?php _e( 'Delete Transients That Will Expire', 'pw-transients-manager' ); ?>" />
 				</form>
 
 				<div class="tablenav top">
@@ -447,8 +447,8 @@ class PW_Transients_Manager {
 				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager' ) ); exit;
 				break;
 
-			case 'delete_transients_that_will_expire' :
-				$this->delete_transients_that_will_expire();
+			case 'delete_transients_with_expiration' :
+				$this->delete_transients_with_expirations();
 				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager' ) ); exit;
 				break;
 
@@ -509,7 +509,7 @@ class PW_Transients_Manager {
 	 * @return  bool
 	 * @since   
 	*/
-	private function delete_transients_that_will_expire() {
+	private function delete_transients_with_expirations() {
 
 		global $wpdb;
 
