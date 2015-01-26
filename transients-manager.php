@@ -357,7 +357,7 @@ class PW_Transients_Manager {
 
 			$value = 'array';
 
-		} elseif( is_object( $value ) ) {
+		} elseif( gettype( $value ) == 'object' ) {
 
 			$value = 'object';
 
