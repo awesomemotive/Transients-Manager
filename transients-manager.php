@@ -113,13 +113,11 @@ class PW_Transients_Manager {
 					<?php wp_nonce_field( 'transient_manager' ); ?>
 					<?php submit_button(); ?>
 				</form>
-				<button class="button-secondary" onclick="history.back();"><?php _e( 'Cancel' ); ?></button>
+				<button class="button-secondary" onclick="history.back();"><?php _e( 'Cancel', 'pw-transients-manager' ); ?></button>
 
 			<?php else : ?>
 
 				<h2><?php _e( 'Transients', 'pw-transients-manager' ); ?></h2>
-
-				<button style="margin-right: 6px;" class="alignleft button-secondary" onclick="window.location.reload();"><?php _e( 'Refresh' ); ?></button>
 
 				<form method="post" class="alignleft">
 					<input type="hidden" name="action" value="delete_expired_transients" />
@@ -137,6 +135,7 @@ class PW_Transients_Manager {
 
 				<form method="get">
 					<p class="search-box">
+						<button style="margin-left: 6px;" class="alignright button-secondary" onclick="window.location.reload();"><?php _e( 'Refresh', 'pw-transients-manager' ); ?></button>
 						<input type="hidden" name="page" value="pw-transients-manager"/>
 						<label class="screen-reader-text" for="transient-search-input"><?php _e( 'Search', 'pw-transients-manager' ); ?></label>
 						<input type="search" id="transient-search-input" name="s" value="<?php echo esc_attr( $search ); ?>"/>
