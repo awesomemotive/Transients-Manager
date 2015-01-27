@@ -119,6 +119,8 @@ class PW_Transients_Manager {
 
 				<h2><?php _e( 'Transients', 'pw-transients-manager' ); ?></h2>
 
+				<button style="margin-right: 6px;" class="alignleft button-secondary" onclick="window.location.reload();"><?php _e( 'Refresh' ); ?></button>
+
 				<form method="post" class="alignleft">
 					<input type="hidden" name="action" value="delete_expired_transients" />
 					<input type="hidden" name="transient" value="all" />
