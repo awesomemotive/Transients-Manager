@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Transients Manager\n"
-"POT-Creation-Date: 2015-01-27 18:26+0100\n"
-"PO-Revision-Date: 2015-01-27 18:27+0100\n"
+"POT-Creation-Date: 2015-01-27 20:14+0100\n"
+"PO-Revision-Date: 2015-01-27 20:14+0100\n"
 "Last-Translator: freemp\n"
 "Language-Team: Chris Christoff <chriscct7@gmail.com>\n"
 "Language: en\n"
@@ -18,85 +18,85 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: transients-manager.php:49
+#: transients-manager.php:38
 msgid "Transients Manager"
-msgstr ""
+msgstr "Transienten-Manager"
 
-#: transients-manager.php:50 transients-manager.php:120
+#: transients-manager.php:39 transients-manager.php:109
 msgid "Transients"
-msgstr ""
+msgstr "Transienten"
 
-#: transients-manager.php:91
+#: transients-manager.php:80
 msgid "Edit Transient"
-msgstr "Transient bearbeiten"
+msgstr "Transiente bearbeiten"
 
-#: transients-manager.php:99 transients-manager.php:158
+#: transients-manager.php:88 transients-manager.php:146
 msgid "Name"
 msgstr ""
 
-#: transients-manager.php:103 transients-manager.php:160
+#: transients-manager.php:92 transients-manager.php:148
 msgid "Expires In"
 msgstr "Verfällt in"
 
-#: transients-manager.php:107 transients-manager.php:159
+#: transients-manager.php:96 transients-manager.php:147
 msgid "Value"
 msgstr "Wert"
 
-#: transients-manager.php:116
+#: transients-manager.php:105
 msgid "Cancel"
 msgstr "Abbrechen"
 
+#: transients-manager.php:115
+msgid "Delete Expired Transients"
+msgstr "Verfallene Transienten löschen"
+
 #: transients-manager.php:122
+msgid "Delete Transients with an Expiration"
+msgstr "Transienten mit Verfallsdatum löschen"
+
+#: transients-manager.php:127
 msgid "Refresh"
 msgstr "Aktualisieren"
 
-#: transients-manager.php:128
-msgid "Delete Expired Transients"
-msgstr "Verfallene Transients löschen"
-
-#: transients-manager.php:135
-msgid "Delete Transients with an Expiration"
-msgstr "Transients mit Verfallsdatum löschen"
-
-#: transients-manager.php:141
+#: transients-manager.php:129
 msgid "Search"
 msgstr "Suche"
 
-#: transients-manager.php:143
+#: transients-manager.php:131
 msgid "Search Transients"
-msgstr "Suche Transients"
+msgstr "Suche Transienten"
 
-#: transients-manager.php:149 transients-manager.php:192
+#: transients-manager.php:137 transients-manager.php:180
 #, php-format
 msgid "%d Transient"
 msgid_plural "%d Transients"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d Transiente"
+msgstr[1] "%d Transienten"
 
-#: transients-manager.php:157
+#: transients-manager.php:145
 msgid "ID"
 msgstr ""
 
-#: transients-manager.php:161
+#: transients-manager.php:149
 msgid "Actions"
 msgstr "Aktionen"
 
-#: transients-manager.php:178
+#: transients-manager.php:166
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: transients-manager.php:180
+#: transients-manager.php:168
 msgid "Delete"
 msgstr "Löschen"
 
-#: transients-manager.php:185
+#: transients-manager.php:173
 msgid "No transients found"
-msgstr "Keine Transients gefunden"
+msgstr "Keine Transienten gefunden"
 
-#: transients-manager.php:373
+#: transients-manager.php:361
 msgid "Does not expire"
 msgstr "Verfällt nie"
 
-#: transients-manager.php:377
+#: transients-manager.php:365
 msgid "Expired"
 msgstr "Verfallen"
