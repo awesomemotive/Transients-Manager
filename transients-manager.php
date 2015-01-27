@@ -9,6 +9,12 @@
  * Contributors: mordauk
 */
 
+/**
+ * Load text domain as early as possible.
+ */
+load_plugin_textdomain( 'pw-transients-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
+
 class PW_Transients_Manager {
 
 	/**
@@ -19,21 +25,8 @@ class PW_Transients_Manager {
 	*/
 	public function __construct() {
 
-		add_action( 'admin_init', array( $this, 'text_domain' ) );
 		add_action( 'admin_menu', array( $this, 'tools_link' ) );
 		add_action( 'admin_init', array( $this, 'process_actions' ) );
-
-	}
-
-	/**
-	 * Load our plugin's text domain
-	 *
-	 * @access  public
-	 * @since   1.0
-	*/
-	public function text_domain() {
-
-		load_plugin_textdomain( 'pw-transients-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
 	}
 
