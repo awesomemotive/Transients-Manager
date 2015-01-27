@@ -9,6 +9,12 @@
  * Contributors: mordauk
 */
 
+/**
+ * Load text domain as early as possible.
+ */
+load_plugin_textdomain( 'pw-transients-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
+
 class PW_Transients_Manager {
 
 	/**
@@ -19,47 +25,8 @@ class PW_Transients_Manager {
 	*/
 	public function __construct() {
 
-		add_action( 'admin_init', array( $this, 'text_domain' ) );
 		add_action( 'admin_menu', array( $this, 'tools_link' ) );
 		add_action( 'admin_init', array( $this, 'process_actions' ) );
-
-	}
-
-	/**
-	 * Load our plugin's text domain
-	 *
-	 * @access  public
-	 * @since   1.0
-	*/
-	public function text_domain() {
-
-		// Set filter for plugin's languages directory
-		$lang_dir      = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
-
-		// Traditional WordPress plugin locale filter
-		$locale        = apply_filters( 'plugin_locale',  get_locale(), 'pw-transients-manager' );
-		$mofile        = sprintf( '%1$s-%2$s.mo', 'pw-transients-manager', $locale );
-
-		// Setup paths to current locale file
-		$mofile_local  = $lang_dir . $mofile;
-		$mofile_global = WP_LANG_DIR . '/pw-transients-manager/' . $mofile;
-
-		if ( file_exists( $mofile_global ) ) {
-
-			// Look in global /wp-content/languages/pw-transients-manager folder
-			load_textdomain( 'pw-transients-manager', $mofile_global );
-
-		} elseif ( file_exists( $mofile_local ) ) {
-
-			// Look in local /wp-content/plugins/transients-manager/languages/ folder
-			load_textdomain( 'pw-transients-manager', $mofile_local );
-
-		} else {
-
-			// Load the default language files
-			load_plugin_textdomain( 'pw-transients-manager', false, $lang_dir );
-
-		}
 
 	}
 
@@ -139,6 +106,7 @@ class PW_Transients_Manager {
 					<?php wp_nonce_field( 'transient_manager' ); ?>
 					<?php submit_button(); ?>
 				</form>
+				<button class="button-secondary" onclick="history.back();"><?php _e( 'Cancel', 'pw-transients-manager' ); ?></button>
 
 			<?php else : ?>
 
@@ -160,6 +128,7 @@ class PW_Transients_Manager {
 
 				<form method="get">
 					<p class="search-box">
+						<button style="margin-left: 6px;" class="alignright button-secondary" onclick="window.location.reload();"><?php _e( 'Refresh', 'pw-transients-manager' ); ?></button>
 						<input type="hidden" name="page" value="pw-transients-manager"/>
 						<label class="screen-reader-text" for="transient-search-input"><?php _e( 'Search', 'pw-transients-manager' ); ?></label>
 						<input type="search" id="transient-search-input" name="s" value="<?php echo esc_attr( $search ); ?>"/>
