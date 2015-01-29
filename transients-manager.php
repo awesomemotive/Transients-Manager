@@ -19,7 +19,7 @@ class PW_Transients_Manager {
 	*/
 	public function __construct() {
 
-		add_action( 'admin_init', array( $this, 'text_domain' ) );
+		add_action( 'init', array( $this, 'text_domain' ) );
 		add_action( 'admin_menu', array( $this, 'tools_link' ) );
 		add_action( 'admin_init', array( $this, 'process_actions' ) );
 
