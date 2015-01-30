@@ -5,8 +5,8 @@ Contributors: mordauk
 Donate link: http://pippinsplugins.com/support-the-site
 Tags: transients
 Requires at least: 3.6
-Tested up to: 4.0
-Stable Tag: 1.2.1
+Tested up to: 4.1
+Stable Tag: 1.3
 
 Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
 
@@ -15,7 +15,6 @@ Provides a UI to manage your site's transients. You can view, search, edit, and 
 This is a developer's tool that provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
 
 Have you found a bug or have a suggestion or improvement you'd like to submit? This plugin is available on [Github](https://github.com/pippinsplugins/Transients-Manager/) and pull requests are welcome!
-
 
 == Screenshots ==
 
@@ -26,14 +25,21 @@ Have you found a bug or have a suggestion or improvement you'd like to submit? T
 1. Activate the plugin
 2. Go to Tools > Transients
 
-= How do I Show My Shopping Cart? =
+== Frequently Asked Questions ==
 
-_Does this work with sites that use object caching?_
+= Does this work with sites that use object caching? =
 
 Not at this time, it only works when transients are stored in the options table.
 
-
 == Changelog ==
+
+= 1.3 - January 29, 2015 =
+
+* New: Added Cancel button to the edit screen, props @freemp 
+* New: Added Refresh button to the main screen, props @freemp 
+* New: Added German translation, props @freemp 
+* New: Added Brazilian Portuguese translation, props @freemp 
+* Fix: Replaced English PO file with POT file
 
 = 1.2.1 - January 26, 2015 =
 
