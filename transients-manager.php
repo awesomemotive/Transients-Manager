@@ -90,7 +90,7 @@ class PW_Transients_Manager {
 	public function admin() {
 
 		$search      = ! empty( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
-		$page        = isset( $_GET['p'] )   ? absint( $_GET['p'] )              : 1;
+		$page        = isset( $_GET['paged'] )   ? absint( $_GET['paged'] )      : 1;
 		$per_page    = 30;
 		$offset      = $per_page * ( $page - 1 );
 		$count       = $this->get_total_transients( $search );
@@ -101,8 +101,8 @@ class PW_Transients_Manager {
 			'number' => $per_page
 		);
 		$pagination  = paginate_links( array(
-			'base'   => 'admin.php?' . remove_query_arg( 'p', $_SERVER['QUERY_STRING'] ) . '%_%',
-			'format' => '&p=%#%',
+			'base'   => 'tools.php?%_%',
+			'format' => '&paged=%#%',
 			'total'  => $pages,
 			'current'=> $page
 		));
