@@ -250,7 +250,7 @@ class PW_Transients_Manager {
 
 		if( false === $transients ) {
 
-			$sql = "SELECT * FROM $wpdb->options WHERE option_name LIKE '\_transient\_%' AND option_name NOT LIKE '\_transient\_timeout%'";
+			$sql = "SELECT * FROM $wpdb->options WHERE option_name LIKE '%\_transient\_%' AND option_name NOT LIKE '%\_transient\_timeout%'";
 
 			if( ! empty( $args['search'] ) ) {
 
@@ -292,7 +292,7 @@ class PW_Transients_Manager {
 
 			if( false === $count ) {
 				$search     = esc_sql( $search );
-				$count = $wpdb->get_var( "SELECT count(option_id) FROM $wpdb->options WHERE option_name LIKE '\_transient\_%' AND option_name NOT LIKE '\_transient\_timeout%' AND option_name LIKE '%{$search}%'" );
+				$count = $wpdb->get_var( "SELECT count(option_id) FROM $wpdb->options WHERE option_name LIKE '%\_transient\_%' AND option_name NOT LIKE '%\_transient\_timeout%' AND option_name LIKE '%{$search}%'" );
 				wp_cache_set( 'pw_transients_' . sanitize_key( $search ), $count, '', 3600 );
 			}
 
@@ -302,7 +302,7 @@ class PW_Transients_Manager {
 
 			if( false === $count ) {
 
-				$count = $wpdb->get_var( "SELECT count(option_id) FROM $wpdb->options WHERE option_name LIKE '\_transient\_%' AND option_name NOT LIKE '\_transient\_timeout%'" );
+				$count = $wpdb->get_var( "SELECT count(option_id) FROM $wpdb->options WHERE option_name LIKE '%\_transient\_%' AND option_name NOT LIKE '%\_transient\_timeout%'" );
 				wp_cache_set( 'pw_transients_count', $count, '', 3600 );
 			}
 
@@ -341,7 +341,8 @@ class PW_Transients_Manager {
 	 * @since   1.0
 	*/
 	private function get_transient_name( $transient ) {
-		return substr( $transient->option_name, 11, strlen( $transient->option_name ) );
+		$length = false !== strpos( $transient->option_name, 'site_' ) ? 16 : 11;
+		return substr( $transient->option_name, $length, strlen( $transient->option_name ) );
 	}
 
 	/**
@@ -378,7 +379,17 @@ class PW_Transients_Manager {
 	*/
 	private function get_transient_expiration_time( $transient ) {
 
-		return get_option( '_transient_timeout_' . $this->get_transient_name( $transient ) );
+		if( false !== strpos( $transient->option_name, 'site_' ) ) {
+
+			$time = get_option( '_site_transient_timeout_' . $this->get_transient_name( $transient ) );
+
+		} else {
+
+			$time = get_option( '_transient_timeout_' . $this->get_transient_name( $transient ) );
+
+		}
+
+		return $time;
 
 	}
 
@@ -430,17 +441,19 @@ class PW_Transients_Manager {
 			return;
 		}
 
-		$search = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
+		$search    = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
+		$transient = $_REQUEST['transient'];
+		$site_wide = strpos( $_REQUEST['name'], '_site' );
 
 		switch( $_REQUEST['action'] ) {
 
 			case 'delete_transient' :
-				$this->delete_transient( $_REQUEST['transient'] );
+				$this->delete_transient( $transient, $site_wide );
 				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager&s=' . $search ) ); exit;
 				break;
 
 			case 'update_transient' :
-				$this->update_transient( $_REQUEST['transient'] );
+				$this->update_transient( $transient, $site_wide );
 				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager&s=' . $search ) ); exit;
 				break;
 
@@ -465,13 +478,21 @@ class PW_Transients_Manager {
 	 * @return  bool
 	 * @since   1.0
 	*/
-	private function delete_transient( $transient = '' ) {
+	private function delete_transient( $transient = '', $site_wide = false ) {
 
 		if( empty( $transient ) ) {
 			return false;
 		}
 
-		return delete_transient( $transient );
+		if( false !== $site_wide ) {
+
+			return delete_site_transient( $transient );
+		
+		} else {
+
+			return delete_transient( $transient );
+		
+		}
 
 	}
 
@@ -487,7 +508,7 @@ class PW_Transients_Manager {
 		global $wpdb;
 
 		$time_now = time();
-		$expired  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '_transient_timeout_%' AND option_value+0 < $time_now" );
+		$expired  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '%_transient_timeout_%' AND option_value+0 < $time_now" );
 
 		if( empty( $expired ) ) {
 			return false;
@@ -516,7 +537,7 @@ class PW_Transients_Manager {
 		global $wpdb;
 
 		$time_now = time();
-		$will_expire  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '_transient_timeout_%'" );
+		$will_expire  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '%_transient_timeout_%'" );
 
 		if( empty( $will_expire ) ) {
 			return false;
@@ -540,7 +561,7 @@ class PW_Transients_Manager {
 	 * @return  bool
 	 * @since   1.0
 	*/
-	private function update_transient( $transient = '' ) {
+	private function update_transient( $transient = '', $site_wide = false ) {
 
 		if( empty( $transient ) ) {
 			return false;
@@ -550,7 +571,16 @@ class PW_Transients_Manager {
 		$expiration = sanitize_text_field( $_POST['expires'] );
 		$expiration = $expiration - time();
 
-		return set_transient( $transient, $value, $expiration );
+		if( false !== $site_wide ) {
+
+			return set_site_transient( $transient, $value, $expiration );
+		
+		} else {
+
+			return set_transient( $transient, $value, $expiration );
+		
+		}
+
 
 	}
 
