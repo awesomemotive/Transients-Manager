@@ -190,7 +190,7 @@ class PW_Transients_Manager {
 						<?php if( $transients ) : ?>
 							<?php foreach( $transients as $transient ) :
 
-								$delete_url = wp_nonce_url( add_query_arg( array( 'action' => 'delete_transient', 'transient' => $this->get_transient_name( $transient ) ) ), 'transient_manager' );
+								$delete_url = wp_nonce_url( add_query_arg( array( 'action' => 'delete_transient', 'transient' => $this->get_transient_name( $transient ), 'name' => $transient->option_name ) ), 'transient_manager' );
 								$edit_url   = add_query_arg( array( 'action' => 'edit_transient', 'trans_id' => $transient->option_id ) );
 								?>
 
