@@ -497,6 +497,31 @@ class PW_Transients_Manager {
 	}
 
 	/**
+	 * Bulk delete function
+	 *
+	 * @access  private
+	 * @return  bool
+	 * @since   1.4
+	*/
+	private function bulk_delete_transients( array $transients ) {
+
+		if( empty( $transients ) ) {
+			return false;
+		}
+
+		foreach( $transients as $transient ) {
+
+			$site_wide = ( strpos( $transient, '_site' ) !== false );
+			$name = str_replace( $site_wide ? '_site_transient_timeout_' : '_transient_timeout_', '', $transient );
+			$this->delete_transient( $name, $site_wide );
+
+		}
+
+		return true;
+
+	}
+
+	/**
 	 * Delete all expired transients
 	 *
 	 * @access  private
@@ -510,19 +535,8 @@ class PW_Transients_Manager {
 		$time_now = time();
 		$expired  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '%_transient_timeout_%' AND option_value+0 < $time_now" );
 
-		if( empty( $expired ) ) {
-			return false;
-		}
 
-		foreach( $expired as $transient ) {
-
-			$site_wide = ( strpos( $transient, '_site' ) !== false );
-			$name = str_replace( $site_wide ? '_site_transient_timeout_' : '_transient_timeout_', '', $transient );
-			$this->delete_transient( $name, $site_wide );
-
-		}
-
-		return true;
+		return $this->bulk_delete_transients( $expired );
 
 	}
 
@@ -539,19 +553,7 @@ class PW_Transients_Manager {
 
 		$will_expire = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '%_transient_timeout_%'" );
 
-		if( empty( $will_expire ) ) {
-			return false;
-		}
-
-		foreach( $will_expire as $transient ) {
-
-			$site_wide = ( strpos( $transient, '_site' ) !== false );
-			$name = str_replace( $site_wide ? '_site_transient_timeout_' : '_transient_timeout_', '', $transient );
-			$this->delete_transient( $name, $site_wide );
-
-		}
-
-		return true;
+		return $this->bulk_delete_transients( $will_expire );
 
 	}
 
