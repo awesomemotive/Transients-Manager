@@ -501,9 +501,9 @@ class PW_Transients_Manager {
 	 *
 	 * @access  private
 	 * @return  bool
-	 * @since   1.4
+	 * @since   1.5
 	*/
-	private function bulk_delete_transients( array $transients ) {
+	private function bulk_delete_transients( $transients = array() ) {
 
 		if( empty( $transients ) ) {
 			return false;
@@ -545,7 +545,7 @@ class PW_Transients_Manager {
 	 *
 	 * @access  private
 	 * @return  bool
-	 * @since   
+	 * @since   1.2
 	*/
 	private function delete_transients_with_expirations() {
 
