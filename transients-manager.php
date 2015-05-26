@@ -516,8 +516,9 @@ class PW_Transients_Manager {
 
 		foreach( $expired as $transient ) {
 
-			$name = str_replace( '_transient_timeout_', '', $transient );
-			delete_transient( $name );
+			$site_wide = ( strpos( $transient, '_site' ) !== false );
+			$name = str_replace( $site_wide ? '_site_transient_timeout_' : '_transient_timeout_', '', $transient );
+			$this->delete_transient( $name, $site_wide );
 
 		}
 
@@ -536,8 +537,7 @@ class PW_Transients_Manager {
 
 		global $wpdb;
 
-		$time_now = time();
-		$will_expire  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '%_transient_timeout_%'" );
+		$will_expire = $wpdb->get_col( "SELECT option_name FROM $wpdb->options where option_name LIKE '%_transient_timeout_%'" );
 
 		if( empty( $will_expire ) ) {
 			return false;
@@ -545,8 +545,9 @@ class PW_Transients_Manager {
 
 		foreach( $will_expire as $transient ) {
 
-			$name = str_replace( '_transient_timeout_', '', $transient );
-			delete_transient( $name );
+			$site_wide = ( strpos( $transient, '_site' ) !== false );
+			$name = str_replace( $site_wide ? '_site_transient_timeout_' : '_transient_timeout_', '', $transient );
+			$this->delete_transient( $name, $site_wide );
 
 		}
 
