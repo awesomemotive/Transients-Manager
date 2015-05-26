@@ -443,7 +443,7 @@ class PW_Transients_Manager {
 
 		$search    = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
 		$transient = $_REQUEST['transient'];
-		$site_wide = strpos( $_REQUEST['name'], '_site' );
+		$site_wide = isset( $_REQUEST['name'] ) && strpos( $_REQUEST['name'], '_site' );
 
 		switch( $_REQUEST['action'] ) {
 
