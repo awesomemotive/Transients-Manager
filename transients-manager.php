@@ -3,7 +3,7 @@
  * Plugin Name: Transients Manager
  * Plugin URL: http://pippinsplugins.com/transients-manager
  * Description: Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
- * Version: 1.5
+ * Version: 1.6
  * Author: Pippin Williamson
  * Author URI: http://pippinsplugins.com
  * Contributors: mordauk
@@ -22,6 +22,10 @@ class PW_Transients_Manager {
 		add_action( 'init', array( $this, 'text_domain' ) );
 		add_action( 'admin_menu', array( $this, 'tools_link' ) );
 		add_action( 'admin_init', array( $this, 'process_actions' ) );
+		add_action( 'admin_bar_menu', array( $this, 'suspend_transients_button' ), 999 );
+		add_filter( 'pre_update_option', array( $this, 'maybe_block_update_transient' ), -1, 3 );
+		add_filter( 'pre_get_option', array( $this, 'maybe_block_update_transient' ), -1, 3 );
+		add_action( 'added_option', array( $this, 'maybe_block_set_transient' ), -1, 2 );
 
 	}
 
@@ -228,6 +232,28 @@ class PW_Transients_Manager {
 	}
 
 	/**
+	 * Add toolbar node for suspending transients
+	 *
+	 * @access  public
+	 * @return  void
+	 * @since   1.6
+	*/
+	public function suspend_transients_button( $wp_admin_bar ) {
+
+		$action = get_option( 'pw_tm_suspend' ) ? 'unsuspend_transients' : 'suspend_transients';
+		$label  = get_option( 'pw_tm_suspend' ) ? '<span style="color: red;">' . __( 'Unsuspend Transients', 'pw-transients-manager' ) . '</span>' : __( 'Suspend Transients', 'pw-transients-manager' );
+
+		$args = array(
+			'id'     => 'tm-suspend',
+			'title'  => $label,
+			'parent' => 'top-secondary',
+			'href'   => wp_nonce_url( add_query_arg( array( 'action' => $action ) ), 'transient_manager' )
+		);
+		$wp_admin_bar->add_node( $args );
+
+	}
+
+	/**
 	 * Retrieve transients from the database
 	 *
 	 * @access  private
@@ -429,7 +455,7 @@ class PW_Transients_Manager {
 			return;
 		}
 
-		if( empty( $_REQUEST['transient'] ) ) {
+		if( empty( $_REQUEST['transient'] ) && ( 'suspend_transients' !== $_REQUEST['action'] && 'unsuspend_transients' !== $_REQUEST['action'] ) ) {
 			return;
 		}
 
@@ -441,9 +467,13 @@ class PW_Transients_Manager {
 			return;
 		}
 
-		$search    = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
-		$transient = $_REQUEST['transient'];
-		$site_wide = isset( $_REQUEST['name'] ) && strpos( $_REQUEST['name'], '_site' );
+		if( 'suspend_transients' !== $_REQUEST['action'] && 'unsuspend_transients' !== $_REQUEST['action'] ) {
+
+			$search    = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
+			$transient = $_REQUEST['transient'];
+			$site_wide = isset( $_REQUEST['name'] ) && strpos( $_REQUEST['name'], '_site' );
+
+		}
 
 		switch( $_REQUEST['action'] ) {
 
@@ -465,6 +495,18 @@ class PW_Transients_Manager {
 			case 'delete_transients_with_expiration' :
 				$this->delete_transients_with_expirations();
 				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager' ) ); exit;
+				break;
+
+			case 'suspend_transients' :
+
+				update_option( 'pw_tm_suspend', 1 );
+				wp_safe_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) ); exit;
+				break;
+
+			case 'unsuspend_transients' :
+
+				delete_option( 'pw_tm_suspend', 1 );
+				wp_safe_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) ); exit;
 				break;
 
 		}
@@ -584,6 +626,47 @@ class PW_Transients_Manager {
 		
 		}
 
+	}
+
+	/**
+	 * Prevent transient from being updated if transients are suspended
+	 *
+	 * @access  public
+	 * @return  bool
+	 * @since   1.6
+	*/
+	public function maybe_block_update_transient( $value, $option, $old_value ) {
+
+		if( ! get_option( 'pw_tm_suspend' ) ) {
+			return $value;
+		}
+
+		if( false === strpos( $option, '_transient' ) ) {
+			return $value;
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Prevent transient from being updated if transients are suspended
+	 *
+	 * @access  public
+	 * @return  bool
+	 * @since   1.6
+	*/
+	public function maybe_block_set_transient( $option, $value ) {
+
+		if( ! get_option( 'pw_tm_suspend' ) ) {
+			return;
+		}
+
+		if( false === strpos( $option, '_transient' ) ) {
+			return;
+		}
+
+		delete_option( $option );
 
 	}
 
