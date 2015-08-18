@@ -12,7 +12,7 @@ Provides a UI to manage your site's transients. You can view, search, edit, and 
 
 == Description ==
 
-This is a developer's tool that provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
+This is a developer's tool that provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will. A toolbar option is also provided that allows you to suspend transient updates to help with testing and debugging.
 
 Have you found a bug or have a suggestion or improvement you'd like to submit? This plugin is available on [Github](https://github.com/pippinsplugins/Transients-Manager/) and pull requests are welcome!
 
