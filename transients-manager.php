@@ -205,7 +205,7 @@ class PW_Transients_Manager {
 									<td><?php echo $this->get_transient_expiration( $transient ); ?></td>
 									<td>
 										<a href="<?php echo esc_url( $edit_url ); ?>" class="edit"><?php _e( 'Edit', 'pw-transients-manager' ); ?></a>
-										<span> | </span> 
+										<span> | </span>
 										<a href="<?php echo esc_url( $delete_url ); ?>" class="delete" style="color:#a00;"><?php _e( 'Delete', 'pw-transients-manager' ); ?></a>
 									</td>
 								</tr>
@@ -239,6 +239,10 @@ class PW_Transients_Manager {
 	 * @since   1.6
 	*/
 	public function suspend_transients_button( $wp_admin_bar ) {
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+		    return;
+		}
 
 		$action = get_option( 'pw_tm_suspend' ) ? 'unsuspend_transients' : 'suspend_transients';
 		$label  = get_option( 'pw_tm_suspend' ) ? '<span style="color: red;">' . __( 'Unsuspend Transients', 'pw-transients-manager' ) . '</span>' : __( 'Suspend Transients', 'pw-transients-manager' );
@@ -529,11 +533,11 @@ class PW_Transients_Manager {
 		if( false !== $site_wide ) {
 
 			return delete_site_transient( $transient );
-		
+
 		} else {
 
 			return delete_transient( $transient );
-		
+
 		}
 
 	}
@@ -619,11 +623,11 @@ class PW_Transients_Manager {
 		if( false !== $site_wide ) {
 
 			return set_site_transient( $transient, $value, $expiration );
-		
+
 		} else {
 
 			return set_transient( $transient, $value, $expiration );
-		
+
 		}
 
 	}
