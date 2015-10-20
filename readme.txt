@@ -5,14 +5,25 @@ Contributors: mordauk
 Donate link: http://pippinsplugins.com/support-the-site
 Tags: transients
 Requires at least: 3.6
-Tested up to: 4.3
-Stable Tag: 1.6.1
+Tested up to: 4.4
+Stable Tag: 1.7
 
 Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
 
 == Description ==
 
 This is a developer's tool that provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will. A toolbar option is also provided that allows you to suspend transient updates to help with testing and debugging.
+
+Provides following features:
+
+- Button to suspend transient creation / update
+- View all transients in database
+- Edit the value, name, and expiration of any transient
+- Delete any transient
+- Search transients by name
+- Button to delete all transients
+- Button to delete all expired transients
+- Button to delete all transients without an expiration
 
 Have you found a bug or have a suggestion or improvement you'd like to submit? This plugin is available on [Github](https://github.com/pippinsplugins/Transients-Manager/) and pull requests are welcome!
 
@@ -32,6 +43,10 @@ Have you found a bug or have a suggestion or improvement you'd like to submit? T
 Not at this time, it only works when transients are stored in the options table.
 
 == Changelog ==
+
+= 1.7 - October 20, 2015 =
+
+* New: Added a Delete All Transients button, thanks @MatthewEppelsheimer
 
 = 1.6.1 - September 3, 2015 =
 
