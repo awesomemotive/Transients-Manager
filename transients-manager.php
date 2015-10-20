@@ -163,6 +163,13 @@ class PW_Transients_Manager {
 					<input type="submit" class="button secondary" value="<?php _e( 'Delete Transients with an Expiration', 'pw-transients-manager' ); ?>" />
 				</form>
 
+				<form method="post" class="alignleft">&nbsp;
+					<input type="hidden" name="action" value="delete_all_transients" />
+					<input type="hidden" name="transient" value="all" />
+					<?php wp_nonce_field( 'transient_manager' ); ?>
+					<input type="submit" class="button secondary" value="<?php _e( 'Delete All Transients', 'pw-transients-manager' ); ?>" />
+				</form>
+
 				<form method="get">
 					<p class="search-box">
 						<button style="margin-left: 6px;" class="alignright button-secondary" onclick="window.location.reload();"><?php _e( 'Refresh', 'pw-transients-manager' ); ?></button>
@@ -513,6 +520,12 @@ class PW_Transients_Manager {
 				wp_safe_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) ); exit;
 				break;
 
+			case 'delete_all_transients' :
+
+				$this->delete_all_transients();
+				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager' ) ); exit;
+				break;
+
 		}
 
 	}
@@ -601,6 +614,24 @@ class PW_Transients_Manager {
 
 		return $this->bulk_delete_transients( $will_expire );
 
+	}
+
+	/**
+	 * Delete all transients
+	 *
+	 * @access private
+	 * @return false|int
+	 */
+	private function delete_all_transients() {
+
+		global $wpdb;
+
+		$count = $wpdb->query(
+			"DELETE FROM $wpdb->options
+			WHERE option_name LIKE '\_transient\_%'"
+		);
+
+		return $count;
 	}
 
 	/**
