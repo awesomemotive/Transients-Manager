@@ -6,7 +6,7 @@ Donate link: http://pippinsplugins.com/support-the-site
 Tags: transients
 Requires at least: 3.6
 Tested up to: 4.4
-Stable Tag: 1.7
+Stable Tag: 1.7.1
 
 Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
 
@@ -43,6 +43,10 @@ Have you found a bug or have a suggestion or improvement you'd like to submit? T
 Not at this time, it only works when transients are stored in the options table.
 
 == Changelog ==
+
+= 1.7.1 - November 25, 2015 =
+
+* Fix: Transients with "_site" in their name improperly processed
 
 = 1.7 - October 20, 2015 =
 
