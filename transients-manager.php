@@ -482,7 +482,7 @@ class PW_Transients_Manager {
 
 			$search    = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
 			$transient = $_REQUEST['transient'];
-			$site_wide = isset( $_REQUEST['name'] ) && strpos( $_REQUEST['name'], '_site' );
+			$site_wide = isset( $_REQUEST['name'] ) && strpos( $_REQUEST['name'], '_site_transient' );
 
 		}
 
@@ -570,7 +570,7 @@ class PW_Transients_Manager {
 
 		foreach( $transients as $transient ) {
 
-			$site_wide = ( strpos( $transient, '_site' ) !== false );
+			$site_wide = ( strpos( $transient, '_site_transient' ) !== false );
 			$name = str_replace( $site_wide ? '_site_transient_timeout_' : '_transient_timeout_', '', $transient );
 			$this->delete_transient( $name, $site_wide );
 
