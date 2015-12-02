@@ -378,7 +378,7 @@ class PW_Transients_Manager {
 	 * @since   1.0
 	*/
 	private function get_transient_name( $transient ) {
-		$length = false !== strpos( $transient->option_name, 'site_' ) ? 16 : 11;
+		$length = false !== strpos( $transient->option_name, 'site_transient_' ) ? 16 : 11;
 		return substr( $transient->option_name, $length, strlen( $transient->option_name ) );
 	}
 
@@ -416,7 +416,7 @@ class PW_Transients_Manager {
 	*/
 	private function get_transient_expiration_time( $transient ) {
 
-		if( false !== strpos( $transient->option_name, 'site_' ) ) {
+		if( false !== strpos( $transient->option_name, 'site_transient_' ) ) {
 
 			$time = get_option( '_site_transient_timeout_' . $this->get_transient_name( $transient ) );
 
