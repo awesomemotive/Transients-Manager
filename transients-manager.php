@@ -460,13 +460,15 @@ class PW_Transients_Manager {
 	 * @return  void
 	 * @since   1.0
 	*/
-	public function process_actions() {
+	public function process_actions( $action = false ) {
 
-		if( empty( $_REQUEST['action'] ) ) {
+		$action = ( ! empty( $_REQUEST['action'] ) )? $_REQUEST['action'] : $action;
+		
+		if( empty( $action ) ) {
 			return;
 		}
 
-		if( empty( $_REQUEST['transient'] ) && ( 'suspend_transients' !== $_REQUEST['action'] && 'unsuspend_transients' !== $_REQUEST['action'] ) ) {
+		if( empty( $_REQUEST['transient'] ) && ( 'suspend_transients' !== $action && 'unsuspend_transients' !== $action ) ) {
 			return;
 		}
 
@@ -478,7 +480,7 @@ class PW_Transients_Manager {
 			return;
 		}
 
-		if( 'suspend_transients' !== $_REQUEST['action'] && 'unsuspend_transients' !== $_REQUEST['action'] ) {
+		if( 'suspend_transients' !== $action && 'unsuspend_transients' !== $action ) {
 
 			$search    = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
 			$transient = $_REQUEST['transient'];
@@ -486,7 +488,7 @@ class PW_Transients_Manager {
 
 		}
 
-		switch( $_REQUEST['action'] ) {
+		switch( $action ) {
 
 			case 'delete_transient' :
 				$this->delete_transient( $transient, $site_wide );
