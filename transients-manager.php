@@ -706,4 +706,5 @@ class PW_Transients_Manager {
 	}
 
 }
-new PW_Transients_Manager;
+$tm = new PW_Transients_Manager;
+unset( $tm );
