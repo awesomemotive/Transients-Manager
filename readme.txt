@@ -5,7 +5,7 @@ Contributors: mordauk
 Donate link: http://pippinsplugins.com/support-the-site
 Tags: transients
 Requires at least: 3.6
-Tested up to: 4.6
+Tested up to: 4.7
 Stable Tag: 1.7.3
 
 Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
@@ -44,6 +44,11 @@ Not at this time, it only works when transients are stored in the options table.
 
 == Changelog ==
 
+= 1.7.3 - October 10, 2016 =
+
+* Updated translation files
+* Bulk delete actions are now public so they can be accessed outside the plugin
+
 = 1.7.2 - December 18, 2015 =
 
 * Fix: Incorrect identification of site transients, props @ctalkington
@@ -75,15 +80,15 @@ Not at this time, it only works when transients are stored in the options table.
 
 = 1.3 - January 29, 2015 =
 
-* New: Added Cancel button to the edit screen, props @freemp 
-* New: Added Refresh button to the main screen, props @freemp 
-* New: Added German translation, props @freemp 
-* New: Added Brazilian Portuguese translation, props @freemp 
+* New: Added Cancel button to the edit screen, props @freemp
+* New: Added Refresh button to the main screen, props @freemp
+* New: Added German translation, props @freemp
+* New: Added Brazilian Portuguese translation, props @freemp
 * Fix: Replaced English PO file with POT file
 
 = 1.2.1 - January 26, 2015 =
 
-* Fix: Properly detect class definitions that are passed to get_transient_value(), props @freemp 
+* Fix: Properly detect class definitions that are passed to get_transient_value(), props @freemp
 
 = 1.2 - July 21, 2014 =
 
