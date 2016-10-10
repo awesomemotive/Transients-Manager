@@ -583,11 +583,11 @@ class PW_Transients_Manager {
 	/**
 	 * Delete all expired transients
 	 *
-	 * @access  private
+	 * @access  public
 	 * @return  bool
 	 * @since   1.1
 	*/
-	private function delete_expired_transients() {
+	public function delete_expired_transients() {
 
 		global $wpdb;
 
@@ -602,11 +602,11 @@ class PW_Transients_Manager {
 	/**
 	 * Delete all transients with expiration
 	 *
-	 * @access  private
+	 * @access  public
 	 * @return  bool
 	 * @since   1.2
 	*/
-	private function delete_transients_with_expirations() {
+	public function delete_transients_with_expirations() {
 
 		global $wpdb;
 
@@ -619,10 +619,10 @@ class PW_Transients_Manager {
 	/**
 	 * Delete all transients
 	 *
-	 * @access private
+	 * @access public
 	 * @return false|int
 	 */
-	private function delete_all_transients() {
+	public function delete_all_transients() {
 
 		global $wpdb;
 
