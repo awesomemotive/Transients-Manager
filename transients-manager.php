@@ -127,7 +127,7 @@ class PW_Transients_Manager {
 						<tbody>
 							<tr>
 								<th><?php _e( 'Name', 'pw-transients-manager' ); ?></th>
-								<td><input type="text" class="large-text" name="name" value="<?php echo esc_attr( $transient->option_name ); ?>" /></td>
+								<td><input type="text" class="large-text" name="name" value="<?php echo $transient->option_name; ?>" /></td>
 							</tr>
 							<tr>
 								<th><?php _e( 'Expires In', 'pw-transients-manager' ); ?></th>
@@ -135,10 +135,10 @@ class PW_Transients_Manager {
 							</tr>
 							<tr>
 								<th><?php _e( 'Value', 'pw-transients-manager' ); ?></th>
-								<td><textarea class="large-text" name="value" rows="10" cols="50"><?php echo esc_textarea( $transient->option_value ); ?></textarea></td>
+								<td><textarea class="large-text" name="value" rows="10" cols="50"><?php echo $transient->option_value; ?></textarea></td>
 							</tr>
 					</table>
-					<input type="hidden" name="transient" value="<?php echo esc_attr( $this->get_transient_name( $transient ) ); ?>"/>
+					<input type="hidden" name="transient" value="<?php echo $this->get_transient_name( $transient ); ?>"/>
 					<input type="hidden" name="action" value="update_transient"/>
 					<?php wp_nonce_field( 'transient_manager' ); ?>
 					<?php submit_button(); ?>
