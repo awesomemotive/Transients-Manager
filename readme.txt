@@ -5,7 +5,7 @@ Contributors: mordauk
 Donate link: http://pippinsplugins.com/support-the-site
 Tags: transients
 Requires at least: 3.6
-Tested up to: 4.7
+Tested up to: 4.8
 Stable Tag: 1.7.3
 
 Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
