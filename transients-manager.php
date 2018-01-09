@@ -482,7 +482,7 @@ class PW_Transients_Manager {
 
 			$search    = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
 			$transient = $_REQUEST['transient'];
-			$site_wide = isset( $_REQUEST['name'] ) && strpos( $_REQUEST['name'], '_site_transient' );
+			$site_wide = isset( $_REQUEST['name'] ) && false !== strpos( $_REQUEST['name'], '_site_transient' );
 
 		}
 
