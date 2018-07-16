@@ -7,6 +7,8 @@
  * Author: Pippin Williamson
  * Author URI: http://pippinsplugins.com
  * Contributors: mordauk
+ * Text Domain: pw-transients-manager
+ * Domain Path: /languages
 */
 
 class PW_Transients_Manager {
@@ -19,7 +21,7 @@ class PW_Transients_Manager {
 	*/
 	public function __construct() {
 
-		add_action( 'init', array( $this, 'text_domain' ) );
+		add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
 		add_action( 'admin_menu', array( $this, 'tools_link' ) );
 		add_action( 'admin_init', array( $this, 'process_actions' ) );
 		add_action( 'admin_bar_menu', array( $this, 'suspend_transients_button' ), 999 );
@@ -37,33 +39,7 @@ class PW_Transients_Manager {
 	*/
 	public function text_domain() {
 
-		// Set filter for plugin's languages directory
-		$lang_dir      = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
-
-		// Traditional WordPress plugin locale filter
-		$locale        = apply_filters( 'plugin_locale',  get_locale(), 'pw-transients-manager' );
-		$mofile        = sprintf( '%1$s-%2$s.mo', 'pw-transients-manager', $locale );
-
-		// Setup paths to current locale file
-		$mofile_local  = $lang_dir . $mofile;
-		$mofile_global = WP_LANG_DIR . '/pw-transients-manager/' . $mofile;
-
-		if ( file_exists( $mofile_global ) ) {
-
-			// Look in global /wp-content/languages/pw-transients-manager folder
-			load_textdomain( 'pw-transients-manager', $mofile_global );
-
-		} elseif ( file_exists( $mofile_local ) ) {
-
-			// Look in local /wp-content/plugins/transients-manager/languages/ folder
-			load_textdomain( 'pw-transients-manager', $mofile_local );
-
-		} else {
-
-			// Load the default language files
-			load_plugin_textdomain( 'pw-transients-manager', false, $lang_dir );
-
-		}
+		load_plugin_textdomain('pw-transients-manager', false, dirname(plugin_basename( __FILE__)) . '/languages/');
 
 	}
 
