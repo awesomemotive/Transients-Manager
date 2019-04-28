@@ -149,7 +149,7 @@ class PW_Transients_Manager {
 				<form method="get">
 					<p class="search-box">
 						<button style="margin-left: 6px;" class="alignright button-secondary" onclick="window.location.reload();"><?php _e( 'Refresh', 'transients-manager' ); ?></button>
-						<input type="hidden" name="page" value="transients-manager"/>
+						<input type="hidden" name="page" value="pw-transients-manager"/>
 						<label class="screen-reader-text" for="transient-search-input"><?php _e( 'Search', 'transients-manager' ); ?></label>
 						<input type="search" id="transient-search-input" name="s" value="<?php echo esc_attr( $search ); ?>"/>
 						<input type="submit" class="button-secondary" value="<?php _e( 'Search Transients', 'transients-manager' ); ?>"/>
