@@ -5,8 +5,8 @@ Contributors: mordauk
 Donate link: http://pippinsplugins.com/support-the-site
 Tags: transients
 Requires at least: 3.6
-Tested up to: 5.2
-Stable Tag: 1.7.7
+Tested up to: 5.3
+Stable Tag: 1.8
 
 Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
 
@@ -43,6 +43,10 @@ Have you found a bug or have a suggestion or improvement you'd like to submit? T
 Not at this time, it only works when transients are stored in the options table.
 
 == Changelog ==
+
+= 1.8 - November 20, 2019
+
+* New: Added support for bulk deleting selected transients, props to Ash0ur
 
 = 1.7.7 - April 28, 2019 =
 
