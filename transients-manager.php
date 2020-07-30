@@ -3,7 +3,7 @@
  * Plugin Name: Transients Manager
  * Plugin URI: http://pippinsplugins.com/transients-manager
  * Description: Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
- * Version: 1.8
+ * Version: 1.8.1
  * Author: Pippin Williamson
  * Author URI: http://pippinsplugins.com
  * Contributors: mordauk
