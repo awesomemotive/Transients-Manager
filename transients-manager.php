@@ -99,7 +99,7 @@ class PW_Transients_Manager {
 				<?php $transient = $this->get_transient_by_id( absint( $_GET['trans_id'] ) ); ?>
 
 				<form method="post">
-					<table class="form-table">
+					<table class="form-table striped">
 						<tbody>
 							<tr>
 								<th><?php _e( 'Name', 'transients-manager' ); ?></th>
@@ -171,7 +171,7 @@ class PW_Transients_Manager {
 						</div>
 						<br class="clear">
 					</div>
-					<table class="wp-list-table widefat fixed posts">
+					<table class="wp-list-table widefat fixed posts striped">
 						<thead>
 							<tr>
 								<td id="cb" class="manage-column column-cb check-column">
