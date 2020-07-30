@@ -3,10 +3,12 @@
  * Plugin Name: Transients Manager
  * Plugin URI: http://pippinsplugins.com/transients-manager
  * Description: Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
- * Version: 1.7.4
+ * Version: 1.8
  * Author: Pippin Williamson
  * Author URI: http://pippinsplugins.com
  * Contributors: mordauk
+ * Text Domain: transients-manager
+ * Domain Path: /languages
 */
 
 class PW_Transients_Manager {
@@ -19,7 +21,7 @@ class PW_Transients_Manager {
 	*/
 	public function __construct() {
 
-		add_action( 'init', array( $this, 'text_domain' ) );
+		add_action( 'plugins_loaded', array( $this, 'text_domain' ) );
 		add_action( 'admin_menu', array( $this, 'tools_link' ) );
 		add_action( 'admin_init', array( $this, 'process_actions' ) );
 		add_action( 'admin_bar_menu', array( $this, 'suspend_transients_button' ), 999 );
@@ -37,33 +39,7 @@ class PW_Transients_Manager {
 	*/
 	public function text_domain() {
 
-		// Set filter for plugin's languages directory
-		$lang_dir      = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
-
-		// Traditional WordPress plugin locale filter
-		$locale        = apply_filters( 'plugin_locale',  get_locale(), 'pw-transients-manager' );
-		$mofile        = sprintf( '%1$s-%2$s.mo', 'pw-transients-manager', $locale );
-
-		// Setup paths to current locale file
-		$mofile_local  = $lang_dir . $mofile;
-		$mofile_global = WP_LANG_DIR . '/pw-transients-manager/' . $mofile;
-
-		if ( file_exists( $mofile_global ) ) {
-
-			// Look in global /wp-content/languages/pw-transients-manager folder
-			load_textdomain( 'pw-transients-manager', $mofile_global );
-
-		} elseif ( file_exists( $mofile_local ) ) {
-
-			// Look in local /wp-content/plugins/transients-manager/languages/ folder
-			load_textdomain( 'pw-transients-manager', $mofile_local );
-
-		} else {
-
-			// Load the default language files
-			load_plugin_textdomain( 'pw-transients-manager', false, $lang_dir );
-
-		}
+		load_plugin_textdomain('transients-manager', false, dirname(plugin_basename( __FILE__)) . '/languages/');
 
 	}
 
@@ -76,8 +52,8 @@ class PW_Transients_Manager {
 	public function tools_link() {
 
 		add_management_page(
-			__( 'Transients Manager', 'pw-transients-manager' ),
-			__( 'Transients', 'pw-transients-manager' ),
+			__( 'Transients Manager', 'transients-manager' ),
+			__( 'Transients', 'transients-manager' ),
 			'manage_options',
 			'pw-transients-manager',
 			array( $this, 'admin' )
@@ -118,23 +94,23 @@ class PW_Transients_Manager {
 
 			<?php if( ! empty( $_GET['action'] ) && 'edit_transient' == $_GET['action'] ) : ?>
 
-				<h2><?php _e( 'Edit Transient', 'pw-transients-manager' ); ?></h2>
+				<h2><?php _e( 'Edit Transient', 'transients-manager' ); ?></h2>
 
 				<?php $transient = $this->get_transient_by_id( absint( $_GET['trans_id'] ) ); ?>
 
 				<form method="post">
-					<table class="form-table">
+					<table class="form-table striped">
 						<tbody>
 							<tr>
-								<th><?php _e( 'Name', 'pw-transients-manager' ); ?></th>
+								<th><?php _e( 'Name', 'transients-manager' ); ?></th>
 								<td><input type="text" class="large-text" name="name" value="<?php echo esc_attr( $transient->option_name ); ?>" /></td>
 							</tr>
 							<tr>
-								<th><?php _e( 'Expires In', 'pw-transients-manager' ); ?></th>
+								<th><?php _e( 'Expires In', 'transients-manager' ); ?></th>
 								<td><input type="text" class="large-text" name="expires" value="<?php echo $this->get_transient_expiration_time( $transient ); ?>"/>
 							</tr>
 							<tr>
-								<th><?php _e( 'Value', 'pw-transients-manager' ); ?></th>
+								<th><?php _e( 'Value', 'transients-manager' ); ?></th>
 								<td><textarea class="large-text" name="value" rows="10" cols="50"><?php echo esc_textarea( $transient->option_value ); ?></textarea></td>
 							</tr>
 					</table>
@@ -149,90 +125,107 @@ class PW_Transients_Manager {
 
 			<?php else : ?>
 
-				<h2><?php _e( 'Transients', 'pw-transients-manager' ); ?></h2>
+				<h2><?php _e( 'Transients', 'transients-manager' ); ?></h2>
 
 				<form method="post" class="alignleft">
 					<input type="hidden" name="action" value="delete_expired_transients" />
 					<input type="hidden" name="transient" value="all" />
 					<?php wp_nonce_field( 'transient_manager' ); ?>
-					<input type="submit" class="button secondary" value="<?php _e( 'Delete Expired Transients', 'pw-transients-manager' ); ?>" />
+					<input type="submit" class="button secondary" value="<?php _e( 'Delete Expired Transients', 'transients-manager' ); ?>" />
 				</form>
 
 				<form method="post" class="alignleft">&nbsp;
 					<input type="hidden" name="action" value="delete_transients_with_expiration" />
 					<input type="hidden" name="transient" value="all" />
 					<?php wp_nonce_field( 'transient_manager' ); ?>
-					<input type="submit" class="button secondary" value="<?php _e( 'Delete Transients with an Expiration', 'pw-transients-manager' ); ?>" />
+					<input type="submit" class="button secondary" value="<?php _e( 'Delete Transients with an Expiration', 'transients-manager' ); ?>" />
 				</form>
 
 				<form method="post" class="alignleft">&nbsp;
 					<input type="hidden" name="action" value="delete_all_transients" />
 					<input type="hidden" name="transient" value="all" />
 					<?php wp_nonce_field( 'transient_manager' ); ?>
-					<input type="submit" class="button secondary" value="<?php _e( 'Delete All Transients', 'pw-transients-manager' ); ?>" />
+					<input type="submit" class="button secondary" value="<?php _e( 'Delete All Transients', 'transients-manager' ); ?>" />
 				</form>
 
 				<form method="get">
 					<p class="search-box">
-						<button style="margin-left: 6px;" class="alignright button-secondary" onclick="window.location.reload();"><?php _e( 'Refresh', 'pw-transients-manager' ); ?></button>
+						<button style="margin-left: 6px;" class="alignright button-secondary" onclick="window.location.reload();"><?php _e( 'Refresh', 'transients-manager' ); ?></button>
 						<input type="hidden" name="page" value="pw-transients-manager"/>
-						<label class="screen-reader-text" for="transient-search-input"><?php _e( 'Search', 'pw-transients-manager' ); ?></label>
+						<label class="screen-reader-text" for="transient-search-input"><?php _e( 'Search', 'transients-manager' ); ?></label>
 						<input type="search" id="transient-search-input" name="s" value="<?php echo esc_attr( $search ); ?>"/>
-						<input type="submit" class="button-secondary" value="<?php _e( 'Search Transients', 'pw-transients-manager' ); ?>"/>
+						<input type="submit" class="button-secondary" value="<?php _e( 'Search Transients', 'transients-manager' ); ?>"/>
 					</p>
 				</form>
 
-				<div class="tablenav top">
-					<div class="tablenav-pages">
-						<span class="displaying-num"><?php printf( _n( '%d Transient', '%d Transients', $count, 'pw-transients-manager' ), $count ); ?></span>
-						<span class="pagination-links"><?php echo $pagination; ?></span>
+				<form method="post">
+					<div class="tablenav top">
+						<div class="alignleft actions bulkactions">
+							<input type="hidden" name="action" value="delete_selected_transients" />
+							<input type="hidden" name="transient" value="all" />
+							<label for="bulk-action-selector-top" class="screen-reader-text">Select Bulk action</label>
+							<?php wp_nonce_field( 'transient_manager' ); ?>
+							<input type="submit" class="button secondary" value="<?php _e( 'Delete Selected Transients', 'transients-manager' ); ?>" />
+						</div>
+						<div class="tablenav-pages">
+							<span class="displaying-num"><?php printf( _n( '%d Transient', '%d Transients', $count, 'transients-manager' ), $count ); ?></span>
+							<span class="pagination-links"><?php echo $pagination; ?></span>
+						</div>
+						<br class="clear">
 					</div>
-				</div>
+					<table class="wp-list-table widefat fixed posts striped">
+						<thead>
+							<tr>
+								<td id="cb" class="manage-column column-cb check-column">
+									<label for="cb-select-all-<?php echo $page; ?>" class="screen-reader-text">Select All</label>
+									<input type="checkbox" id="cb-select-all-<?php echo $page; ?>">
+								</td>
+								<th style="width:40px;"><?php _e( 'ID', 'transients-manager' ); ?></th>
+								<th><?php _e( 'Name', 'transients-manager' ); ?></th>
+								<th><?php _e( 'Value', 'transients-manager' ); ?></th>
+								<th><?php _e( 'Expires In', 'transients-manager' ); ?></th>
+								<th><?php _e( 'Actions', 'transients-manager' ); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php if( $transients ) : ?>
 
-				<table class="wp-list-table widefat fixed posts">
-					<thead>
-						<tr>
-							<th style="width:40px;"><?php _e( 'ID', 'pw-transients-manager' ); ?></th>
-							<th><?php _e( 'Name', 'pw-transients-manager' ); ?></th>
-							<th><?php _e( 'Value', 'pw-transients-manager' ); ?></th>
-							<th><?php _e( 'Expires In', 'pw-transients-manager' ); ?></th>
-							<th><?php _e( 'Actions', 'pw-transients-manager' ); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php if( $transients ) : ?>
-							<?php foreach( $transients as $transient ) :
+								<?php foreach( $transients as $transient ) :
 
-								$delete_url = wp_nonce_url( add_query_arg( array( 'action' => 'delete_transient', 'transient' => $this->get_transient_name( $transient ), 'name' => $transient->option_name ) ), 'transient_manager' );
-								$edit_url   = add_query_arg( array( 'action' => 'edit_transient', 'trans_id' => $transient->option_id ) );
-								?>
+									$delete_url = wp_nonce_url( add_query_arg( array( 'action' => 'delete_transient', 'transient' => $this->get_transient_name( $transient ), 'name' => $transient->option_name ) ), 'transient_manager' );
+									$edit_url   = add_query_arg( array( 'action' => 'edit_transient', 'trans_id' => $transient->option_id ) );
+									?>
 
-								<tr>
-									<td><?php echo $transient->option_id; ?></td>
-									<td><?php echo $this->get_transient_name( $transient ); ?></td>
-									<td><?php echo $this->get_transient_value( $transient ); ?></td>
-									<td><?php echo $this->get_transient_expiration( $transient ); ?></td>
-									<td>
-										<a href="<?php echo esc_url( $edit_url ); ?>" class="edit"><?php _e( 'Edit', 'pw-transients-manager' ); ?></a>
-										<span> | </span>
-										<a href="<?php echo esc_url( $delete_url ); ?>" class="delete" style="color:#a00;"><?php _e( 'Delete', 'pw-transients-manager' ); ?></a>
-									</td>
-								</tr>
-							<?php endforeach; ?>
-						<?php else : ?>
-							<tr><td colspan="5"><?php _e( 'No transients found', 'pw-transients-manager' ); ?></td>
-						<?php endif; ?>
-					</tbody>
-				</table>
+									<tr>
+										<th id="cb" class="manage-column column-cb check-column">
+											<label for="cb-select-<?php echo $page; ?>" class="screen-reader-text">Select <?php echo $this->get_transient_name( $transient ); ?></label>
+											<input type="checkbox" id="cb-select-<?php echo $transient->option_id; ?>" name="transients[]" value="<?php echo $transient->option_id; ?>">
+										</th>
+										<td><?php echo $transient->option_id; ?></td>
+										<td><?php echo $this->get_transient_name( $transient ); ?></td>
+										<td><?php echo $this->get_transient_value( $transient ); ?></td>
+										<td><?php echo $this->get_transient_expiration( $transient ); ?></td>
+										<td>
+											<a href="<?php echo esc_url( $edit_url ); ?>" class="edit"><?php _e( 'Edit', 'transients-manager' ); ?></a>
+											<span> | </span>
+											<a href="<?php echo esc_url( $delete_url ); ?>" class="delete" style="color:#a00;"><?php _e( 'Delete', 'transients-manager' ); ?></a>
+										</td>
+									</tr>
+								<?php endforeach; ?>
+							<?php else : ?>
+								<tr><td colspan="5"><?php _e( 'No transients found', 'transients-manager' ); ?></td>
+							<?php endif; ?>
+						</tbody>
+					</table>
 				<?php if ( $pages > 1 ) : ?>
 					<div class="tablenav bottom">
 						<div class="tablenav-pages">
-							<span class="displaying-num"><?php printf( _n( '%d Transient', '%d Transients', $count, 'pw-transients-manager' ), $count ); ?></span>
+							<span class="displaying-num"><?php printf( _n( '%d Transient', '%d Transients', $count, 'transients-manager' ), $count ); ?></span>
 							<span class="pagination-links"><?php echo $pagination; ?></span>
 						</div>
 					</div><!--end .tablenav-->
 				<?php endif; ?>
-
+				</form>
 			<?php endif; ?>
 
 		</div>
@@ -254,7 +247,7 @@ class PW_Transients_Manager {
 		}
 
 		$action = get_option( 'pw_tm_suspend' ) ? 'unsuspend_transients' : 'suspend_transients';
-		$label  = get_option( 'pw_tm_suspend' ) ? '<span style="color: red;">' . __( 'Unsuspend Transients', 'pw-transients-manager' ) . '</span>' : __( 'Suspend Transients', 'pw-transients-manager' );
+		$label  = get_option( 'pw_tm_suspend' ) ? '<span style="color: red;">' . __( 'Unsuspend Transients', 'transients-manager' ) . '</span>' : __( 'Suspend Transients', 'transients-manager' );
 
 		$args = array(
 			'id'     => 'tm-suspend',
@@ -445,11 +438,11 @@ class PW_Transients_Manager {
 		$expiration = $this->get_transient_expiration_time( $transient );
 
 		if( empty( $expiration ) ) {
-			return __( 'Does not expire', 'pw-transients-manager' );
+			return __( 'Does not expire', 'transients-manager' );
 		}
 
 		if( $time_now > $expiration ) {
-			return __( 'Expired', 'pw-transients-manager' );
+			return __( 'Expired', 'transients-manager' );
 		}
 		return human_time_diff( $time_now, $expiration );
 
@@ -498,6 +491,11 @@ class PW_Transients_Manager {
 			case 'update_transient' :
 				$this->update_transient( $transient, $site_wide );
 				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager&s=' . $search ) ); exit;
+				break;
+
+			case 'delete_selected_transients' :
+				$this->delete_selected_transients();
+				wp_safe_redirect( admin_url( 'tools.php?page=pw-transients-manager' ) ); exit;
 				break;
 
 			case 'delete_expired_transients' :
@@ -580,6 +578,34 @@ class PW_Transients_Manager {
 
 		return true;
 
+	}
+
+	/**
+	 * Delete Selected transients.
+	 *
+	 * @access  public
+	 * @return  false|int
+	 * @since   1.8
+	 */
+	public function delete_selected_transients() {
+		global $wpdb;
+		if ( ! empty( $_REQUEST['transients'] ) && is_array( $_REQUEST['transients'] ) ) {
+
+			$transients_ids_filtered = array_map(
+				function( $transient_id ) {
+					return absint( $transient_id );
+				},
+				$_REQUEST['transients']
+			);
+
+			if ( ! empty( $transients_ids_filtered ) ) {
+				$placeholders = array_fill( 0, count( $transients_ids_filtered ), '%d' );
+				$format       = implode( ', ', $placeholders );
+				$count        = $wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->options WHERE option_id IN ($format)", $transients_ids_filtered ) );
+				return $count;
+			}
+		}
+		return 0;
 	}
 
 	/**
