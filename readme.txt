@@ -44,12 +44,12 @@ Not at this time, it only works when transients are stored in the options table.
 
 == Changelog ==
 
-= 1.8.1 - July 30, 2029
+= 1.8.1 - July 30, 2029 =
 
 * Tweak: Added stripes to transients table rows for improved readability, props @malavvasita
 * Tweak: Improved HTML markup and functionality of Cancel button on edit screens, props @cfoellmann
 
-= 1.8 - November 20, 2019
+= 1.8 - November 20, 2019 =
 
 * New: Added support for bulk deleting selected transients, props to Ash0ur
 
@@ -62,6 +62,7 @@ Not at this time, it only works when transients are stored in the options table.
 * Changes text domain from "pw-transients-manager" to "transients-manager" in order to support translationsn through WordPress.org.
 
 = 1.7.5 - July 24, 2018 =
+
 * Fix: Language files not loading properly.
 
 = 1.7.4 - January 8, 2018 =
