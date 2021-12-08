@@ -62,6 +62,7 @@ Not at this time, it only works when transients are stored in the options table.
 * Changes text domain from "pw-transients-manager" to "transients-manager" in order to support translationsn through WordPress.org.
 
 = 1.7.5 - July 24, 2018 =
+
 * Fix: Language files not loading properly.
 
 = 1.7.4 - January 8, 2018 =
