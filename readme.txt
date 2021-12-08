@@ -44,7 +44,7 @@ Not at this time, it only works when transients are stored in the options table.
 
 == Changelog ==
 
-= 1.8.1 - July 30, 2029 =
+= 1.8.1 - July 30, 2019 =
 
 * Tweak: Added stripes to transients table rows for improved readability, props @malavvasita
 * Tweak: Improved HTML markup and functionality of Cancel button on edit screens, props @cfoellmann
