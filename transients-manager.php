@@ -261,8 +261,7 @@ class PW_Transients_Manager {
 			'id'     => 'tm-view',
 			'title'  => __( 'View All Transients', 'transients-manager' ),
 			'parent' => 'tm-suspend',
-			'href'   => admin_url('tools.php?page=pw-transients-manager'),
-			'meta' => array('target' => '_blank')
+			'href'   => admin_url( 'tools.php?page=pw-transients-manager' ),
 		);
 		$wp_admin_bar->add_node( $args );
 	}
