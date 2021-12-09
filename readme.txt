@@ -1,18 +1,17 @@
 === Transients Manager ===
-Plugin URI: http://pippinsplugins.com/tranients-manager
-Author URI: http://pippinsplugins.com
-Contributors: mordauk
-Donate link: http://pippinsplugins.com/support-the-site
-Tags: transients
-Requires at least: 3.6
-Tested up to: 5.5
-Stable Tag: 1.8.1
+Plugin URI:        https://wordpress.org/plugins/transients-manager/
+Author URI:        https://awesomemotive.com
+Contributors:      mordauk, johnjamesjacoby
+Tags:              tool, transients
+Requires at least: 5.0
+Tested up to:      5.9
+Stable Tag:        1.8.1
 
-Provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will.
+Provides an interface to manage to view, search, edit, and delete Transients.
 
 == Description ==
 
-This is a developer's tool that provides a UI to manage your site's transients. You can view, search, edit, and delete transients at will. A toolbar option is also provided that allows you to suspend transient updates to help with testing and debugging.
+This is a developer tool that provides a user interface to manage your site's transients. You can view, search, edit, and delete transients at will. A toolbar option is also provided that allows you to suspend transient updates to help with testing and debugging.
 
 Provides following features:
 
@@ -59,7 +58,7 @@ Not at this time, it only works when transients are stored in the options table.
 
 = 1.7.6 - March 30, 2019 =
 
-* Changes text domain from "pw-transients-manager" to "transients-manager" in order to support translationsn through WordPress.org.
+* Changes text domain from "pw-transients-manager" to "transients-manager" to support translations through WordPress.org.
 
 = 1.7.5 - July 24, 2018 =
 
