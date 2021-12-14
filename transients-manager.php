@@ -255,7 +255,7 @@ class AM_Transients_Manager {
 						<option value="delete_transients_without_expiration"><?php _e( 'Delete Without Expiration', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Purge', 'transients-manager' ); ?>">
+					<optgroup label="<?php _e( 'Flush', 'transients-manager' ); ?>">
 						<option value="delete_all_transients"><?php _e( 'Delete All', 'transients-manager' ); ?></option>
 					</optgroup>
 				</select>
@@ -272,8 +272,8 @@ class AM_Transients_Manager {
 			<thead>
 				<tr>
 					<td id="cb" class="manage-column column-cb check-column">
-						<label for="cb-select-all-<?php echo $page; ?>" class="screen-reader-text"><?php _e( 'Select All', 'transients-manager' ); ?></label>
-						<input type="checkbox" id="cb-select-all-<?php echo $page; ?>">
+						<label for="cb-select-all-<?php echo (int) $page; ?>" class="screen-reader-text"><?php _e( 'Select All', 'transients-manager' ); ?></label>
+						<input type="checkbox" id="cb-select-all-<?php echo (int) $page; ?>">
 					</td>
 					<th class="column-primary"><?php _e( 'Name', 'transients-manager' ); ?></th>
 					<th class="column-value"><?php _e( 'Value', 'transients-manager' ); ?></th>
@@ -285,12 +285,17 @@ class AM_Transients_Manager {
 
 					foreach ( $transients as $transient ) :
 
+						// Get Transient name
+						$name       = $this->get_transient_name( $transient );
+						$value      = $this->get_transient_value( $transient );
+						$expiration = $this->get_transient_expiration( $transient );
+
 						// Delete
 						$delete_url = wp_nonce_url(
 							add_query_arg(
 								array(
 									'action'    => 'delete_transient',
-									'transient' => $this->get_transient_name( $transient ),
+									'transient' => $name,
 									'name'      => $transient->option_name
 								)
 							),
@@ -307,19 +312,33 @@ class AM_Transients_Manager {
 
 						<tr>
 							<th id="cb" class="manage-column column-cb check-column">
-								<label for="cb-select-<?php echo (int) $page; ?>" class="screen-reader-text">Select <?php echo $this->get_transient_name( $transient ); ?></label>
+								<label for="cb-select-<?php echo (int) $page; ?>" class="screen-reader-text"><?php printf( __( 'Select %s', 'transients-manager' ), esc_html( $name ) ); ?></label>
 								<input type="checkbox" id="cb-select-<?php echo (int) $transient->option_id; ?>" name="transients[]" value="<?php echo (int) $transient->option_id; ?>">
 							</th>
-							<td class="column-primary">
-								<pre><code class="transient-name" title="<?php echo (int) $transient->option_id; ?>"><?php echo $this->get_transient_name( $transient ); ?></code></pre>
+
+							<td class="column-primary" data-colname="<?php _e( 'Name', 'transients-manager' ); ?>">
+								<pre><code class="transient-name" title="<?php echo (int) $transient->option_id; ?>"><?php echo esc_html( $name ); ?></code></pre>
 								<div class="row-actions">
 									<span class="edit"><a href="<?php echo esc_url( $edit_url ); ?>" class="edit"><?php _e( 'Edit', 'transients-manager' ); ?></a></span>
 									|
 									<span class="delete"><a href="<?php echo esc_url( $delete_url ); ?>" class="delete"><?php _e( 'Delete', 'transients-manager' ); ?></a></span>
 								</div>
+								<button type="button" class="toggle-row">
+									<span class="screen-reader-text"><?php _e( 'Show more details', 'transient-manager' ); ?></span>
+								</button>
 							</td>
-							<td><span class="transient-value"><?php echo $this->get_transient_value( $transient ); ?></span></td>
-							<td><span class="transient-expiration"><?php echo $this->get_transient_expiration( $transient ); ?></span></td>
+
+							<td data-colname="<?php _e( 'Value', 'transients-manager' ); ?>">
+								<span class="transient-value"><?php
+									echo $value; // HTML OK
+								?></span>
+							</td>
+
+							<td data-colname="<?php _e( 'Expiration', 'transients-manager' ); ?>">
+								<span class="transient-expiration"><?php
+									echo $expiration; // HTML OK
+								?></span>
+							</td>
 						</tr>
 
 					<?php endforeach;
@@ -359,7 +378,7 @@ class AM_Transients_Manager {
 						<option value="delete_transients_without_expiration"><?php _e( 'Delete Without Expiration', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Purge', 'transients-manager' ); ?>">
+					<optgroup label="<?php _e( 'Flush', 'transients-manager' ); ?>">
 						<option value="delete_all_transients"><?php _e( 'Delete All', 'transients-manager' ); ?></option>
 					</optgroup>
 				</select>
@@ -387,6 +406,8 @@ class AM_Transients_Manager {
 	public function page_edit_transient() {
 		$transient_id = ! empty( $_GET['trans_id'] ) ? absint( $_GET['trans_id'] ) : 0;
 		$transient    = $this->get_transient_by_id( $transient_id );
+
+		$name = $this->get_transient_name( $transient );
 ?>
 
 <div class="wrap">
@@ -394,7 +415,7 @@ class AM_Transients_Manager {
 	<hr class="wp-header-end">
 
 	<form method="post">
-		<input type="hidden" name="transient" value="<?php echo esc_attr( $this->get_transient_name( $transient ) ); ?>" />
+		<input type="hidden" name="transient" value="<?php echo esc_attr( $name ); ?>" />
 		<input type="hidden" name="action" value="update_transient" />
 		<?php wp_nonce_field( 'transients_manager' ); ?>
 
@@ -700,11 +721,13 @@ class AM_Transients_Manager {
 	 */
 	private function get_transient_expiration_time( $transient ) {
 
+		$name = $this->get_transient_name( $transient );
+
 		if ( false !== strpos( $transient->option_name, '_site_transient' ) ) {
-			$time = get_option( '_site_transient_timeout_' . $this->get_transient_name( $transient ) );
+			$time = get_option( "_site_transient_timeout_{$name}" );
 
 		} else {
-			$time = get_option( '_transient_timeout_' . $this->get_transient_name( $transient ) );
+			$time = get_option( "_transient_timeout_{$name}" );
 		}
 
 		return $time;
