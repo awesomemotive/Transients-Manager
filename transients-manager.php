@@ -98,25 +98,35 @@ class AM_Transients_Manager {
 	}
 
 	/**
-	 * Render the admin UI
+	 * Editing or showing?
 	 *
-	 * @since 1.0
+	 * @since 2.0
+	 * @return string
 	 */
-	public function admin() {
+	public function page_type() {
 
 		// Sanitize the action
 		$action = ! empty( $_GET['action'] )
 			? sanitize_key( $_GET['action'] )
 			: '';
 
-		// Editing a single Transient
-		if ( ! empty( $action ) && ( 'edit_transient' === $action ) ) {
-			$this->page_edit_transient();
+		// Edit or Show?
+		return ! empty( $action ) && ( 'edit_transient' === $action )
+			? 'edit'
+			: 'show';
+	}
 
-		// Showing specific Transients
-		} else {
-			$this->page_show_transients();
-		}
+	/**
+	 * Render the admin UI
+	 *
+	 * @since 1.0
+	 */
+	public function admin() {
+
+		// Editing a single Transient
+		( 'edit' === $this->page_type() )
+			? $this->page_edit_transient()
+			: $this->page_show_transients();
 	}
 
 	/**
@@ -371,7 +381,7 @@ class AM_Transients_Manager {
 				</tr>
 				<tr>
 					<th><?php _e( 'Value', 'transients-manager' ); ?></th>
-					<td><textarea class="large-text code" name="value" rows="10" cols="50"><?php echo esc_textarea( $transient->option_value ); ?></textarea></td>
+					<td><textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px;"><?php echo esc_textarea( $transient->option_value ); ?></textarea></td>
 				</tr>
 			</tbody>
 		</table>
@@ -1219,8 +1229,58 @@ class AM_Transients_Manager {
 	 */
 	public function print_styles() {
 
-		// Escape once
-		$esc = esc_attr( $this->page_id ); ?>
+		// Get the page type
+		$type = $this->page_type();
+
+		// Editing...
+		if ( 'edit' === $type ) {
+
+			// Try to enqueue the code editor
+			$settings = wp_enqueue_code_editor(
+				array(
+					'type'       => 'text/plain',
+					'codemirror' => array(
+						'indentUnit' => 4,
+						'tabSize'    => 4,
+					),
+				)
+			);
+
+			// Bail if user disabled CodeMirror.
+			if ( false === $settings ) {
+				return;
+			}
+
+			// Target the textarea
+			wp_add_inline_script(
+				'code-editor',
+				sprintf(
+					'jQuery( function() { wp.codeEditor.initialize( "transient-editor", %s ); } );',
+					wp_json_encode( $settings )
+				)
+			);
+
+			// Custom styling
+			wp_add_inline_style(
+				'code-editor',
+				'.CodeMirror-wrap {
+					width: 99%;
+					border: 1px solid #8c8f94;
+					border-radius: 3px;
+					overflow: hidden;
+				}
+				.CodeMirror-gutters {
+					background: transparent;
+				}'
+			);
+
+		// Showing list-table...
+		} else {
+
+			// Escape once
+			$esc = esc_attr( $this->page_id );
+
+?>
 
 <style type="text/css" id="transients-manager">
 	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .column-value {
@@ -1337,6 +1397,7 @@ class AM_Transients_Manager {
 </style>
 
 <?php
+		}
 	}
 }
 
