@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Transients Manager
  * Plugin URI:        https://wordpress.org/plugins/transients-manager/
- * Description:       Provides an interface to manage to view, search, edit, and delete Transients.
+ * Description:       Provides a familiar interface to view, search, edit, and delete Transients.
  * Author:            WPBeginner
  * Author URI:        http://www.wpbeginner.com
  * Contributors:      wpbeginner, smub, mordauk, johnjamesjacoby
@@ -10,8 +10,8 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       transients-manager
  * Requires PHP:      5.6.20
- * Requires at least: 5.0
- * Version:           1.8.1
+ * Requires at least: 5.3
+ * Version:           2.0.0
  */
 
 // Exit if accessed directly
@@ -28,6 +28,22 @@ class AM_Transients_Manager {
 	public $page_id = 'pw-transients-manager';
 
 	/**
+	 * Timestamp for right now
+	 *
+	 * @since 2.0
+	 * @var int
+	 */
+	public $time_now = 0;
+
+	/**
+	 * Timestamp of the next time WP Cron will delete expired transients
+	 *
+	 * @since 2.0
+	 * @var int
+	 */
+	public $next_cron_delete = 0;
+
+	/**
 	 * Get things started
 	 *
 	 * @since 1.0
@@ -35,6 +51,7 @@ class AM_Transients_Manager {
 	public function __construct() {
 		add_action( 'plugins_loaded',    array( $this, 'text_domain' ) );
 		add_action( 'admin_init',        array( $this, 'process_actions' ) );
+		add_action( 'admin_init',        array( $this, 'set_times' ) );
 		add_action( 'admin_menu',        array( $this, 'tools_link' ) );
 		add_action( 'admin_bar_menu',    array( $this, 'suspend_transients_button' ), 999 );
 		add_filter( 'pre_update_option', array( $this, 'maybe_block_update_transient' ), -1, 2 );
@@ -46,107 +63,22 @@ class AM_Transients_Manager {
 	}
 
 	/**
+	 * Set the related timestamp values
+	 *
+	 * @since 2.0
+	 */
+	public function set_times() {
+		$this->time_now         = time();
+		$this->next_cron_delete = wp_next_scheduled( 'delete_expired_transients' );
+	}
+
+	/**
 	 * Load text domain
 	 *
 	 * @since 1.0
 	 */
 	public function text_domain() {
 		load_plugin_textdomain( 'transients-manager' );
-	}
-
-	/**
-	 * Add <style> tag to "admin_print_styles-{$this->page_id}" hook
-	 *
-	 * @since 2.0
-	 */
-	public function print_styles() {
-
-		// Escape once
-		$esc = esc_attr( $this->page_id ); ?>
-
-<style type="text/css" id="transients-manager">
-	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .column-value {
-		width: 30%;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .column-expiration {
-		width: 160px;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .column-primary pre {
-		margin: 0;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .column-primary code {
-
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.transient-value {
-		display: block;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.transient-value,
-	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.transient-expiration {
-		cursor: default;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> .tablenav-pages span.displaying-num {
-		display: inline-block;
-		margin: 5px 0;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links .page-numbers {
-		border-color: #7e8993;
-		color: #32373c;
-		display: inline-block;
-		vertical-align: baseline;
-		min-width: 30px;
-		min-height: 30px;
-		text-decoration: none;
-		text-align: center;
-		font-size: 13px;
-		line-height: 2.15384615;
-		margin: 0;
-		padding: 0 10px;
-		cursor: pointer;
-		border-width: 1px;
-		border-style: solid;
-		border-radius: 3px;
-		-webkit-appearance: none;
-		white-space: nowrap;
-		box-sizing: border-box;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links .page-numbers.next,
-	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links .page-numbers.prev {
-		font-size: 16px;
-		line-height: 1.625;
-		padding: 0 4px;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links a.page-numbers:hover {
-		background-color: #f0f0f1;
-		border-color: #717c87;
-		color: #262a2e;
-	}
-
-	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links span.page-numbers {
-		color: #a7aaad;
-		border-color: #dcdcde;
-		background: #f6f7f7;
-		box-shadow: none;
-		cursor: default;
-		transform: none;
-	}
-</style>
-
-<?php
 	}
 
 	/**
@@ -317,19 +249,23 @@ class AM_Transients_Manager {
 							</th>
 
 							<td class="column-primary" data-colname="<?php _e( 'Name', 'transients-manager' ); ?>">
-								<pre><code class="transient-name" title="<?php echo (int) $transient->option_id; ?>"><?php echo esc_html( $name ); ?></code></pre>
+								<pre class="truncate">
+									<code class="transient-name" title="<?php echo (int) $transient->option_id; ?>"><?php echo esc_html( $name ); ?></code>
+								</pre>
+
 								<div class="row-actions">
 									<span class="edit"><a href="<?php echo esc_url( $edit_url ); ?>" class="edit"><?php _e( 'Edit', 'transients-manager' ); ?></a></span>
 									|
 									<span class="delete"><a href="<?php echo esc_url( $delete_url ); ?>" class="delete"><?php _e( 'Delete', 'transients-manager' ); ?></a></span>
 								</div>
+
 								<button type="button" class="toggle-row">
-									<span class="screen-reader-text"><?php _e( 'Show more details', 'transient-manager' ); ?></span>
+									<span class="screen-reader-text"><?php _e( 'Show more details', 'transients-manager' ); ?></span>
 								</button>
 							</td>
 
 							<td data-colname="<?php _e( 'Value', 'transients-manager' ); ?>">
-								<span class="transient-value"><?php
+								<span class="transient-value truncate"><?php
 									echo $value; // HTML OK
 								?></span>
 							</td>
@@ -389,7 +325,7 @@ class AM_Transients_Manager {
 				<span class="displaying-num"><?php printf( _n( '%s Transient', '%s Transients', $count, 'transients-manager' ), number_format_i18n( $count ) ); ?></span>
 				<span class="pagination-links"><?php echo $pagination; // HTML OK ?></span>
 			</div>
-		</div><!--end .tablenav-->
+		</div>
 	</form>
 
 	<?php $this->site_time(); ?>
@@ -471,7 +407,7 @@ class AM_Transients_Manager {
 				: (string) $gmt_offset;
 
 			$formatted_offset = str_replace(
-				array( '.25', '.5', '.75' ),
+				array( '.25', '.5',  '.75' ),
 				array( ':15', ':30', ':45' ),
 				$formatted_offset
 			);
@@ -481,18 +417,46 @@ class AM_Transients_Manager {
 		$timezone_name = ! empty( $formatted_offset )
 			? 'UTC' . $formatted_offset
 			: str_replace( '_', ' ', $timezone_string );
-?>
 
-<p class="transients-manager-site-time">
-	<?php
-		echo esc_html( sprintf(
+		// Site time
+		$site_time     = date_i18n( 'Y-m-d H:i:s', $this->time_now );
+		$site_time_utc = gmdate( 'Y-m-d\TH:i:s+00:00', $this->time_now );
+		$st_html       = esc_html( sprintf(
 			/* translators: 1: Date and time, 2: Timezone */
 			__( 'Site time: %1$s (%2$s)', 'transients-manager' ),
-			date_i18n( 'Y-m-d H:i:s' ),
+			$site_time,
 			$timezone_name
 		) );
-	?>
-</p>
+
+		// Cron time
+		$cron_time     = wp_date( 'Y-m-d H:i:s', $this->next_cron_delete );
+		$cron_time_utc = gmdate( 'Y-m-d\TH:i:s+00:00', $this->next_cron_delete );
+		$ct_time_since = $this->time_since( $this->next_cron_delete - $this->time_now );
+		$nc_time       = esc_html( sprintf(
+			/* translators: 1: Date and time, 2: Time since */
+			__( 'Auto clean: %1$s (%2$s) - %3$s from now', 'transients-manager' ),
+			$cron_time,
+			$timezone_name,
+			$ct_time_since
+		) );
+?>
+
+<p class="transients-manager-helpful-times">
+	<?php
+
+	echo sprintf( '<time datetime="%1$s" title="%1$s">%2$s</time>',
+		$site_time_utc,
+		$st_html
+	);
+
+	?><br><?php
+
+	echo sprintf( '<time datetime="%1$s" title="%1$s">%2$s</time>',
+		$cron_time_utc,
+		$nc_time
+	);
+
+?></p>
 
 <?php
 	}
@@ -501,6 +465,7 @@ class AM_Transients_Manager {
 	 * Add toolbar node for suspending transients
 	 *
 	 * @since 1.6
+	 * @param object $wp_admin_bar
 	 */
 	public function suspend_transients_button( $wp_admin_bar ) {
 
@@ -510,7 +475,7 @@ class AM_Transients_Manager {
 		}
 
 		$action = get_option( 'pw_tm_suspend' ) ? 'unsuspend_transients' : 'suspend_transients';
-		$label  = get_option( 'pw_tm_suspend' ) ? '<span style="color: red;">' . __( 'Unsuspend Transients', 'transients-manager' ) . '</span>' : __( 'Suspend Transients', 'transients-manager' );
+		$label  = get_option( 'pw_tm_suspend' ) ? '<span style="color: #b32d2e;">' . __( 'Unsuspend Transients', 'transients-manager' ) . '</span>' : __( 'Suspend Transients', 'transients-manager' );
 
 		// Suspend
 		$wp_admin_bar->add_node( array(
@@ -525,7 +490,12 @@ class AM_Transients_Manager {
 			'id'     => 'tm-view',
 			'title'  => __( 'View Transients', 'transients-manager' ),
 			'parent' => 'tm-suspend',
-			'href'   => admin_url( 'tools.php?page=' . $this->page_id ),
+			'href'   => add_query_arg(
+				array(
+					'page' => $this->page_id
+				),
+				admin_url( 'tools.php' )
+			)
 		) );
 	}
 
@@ -533,6 +503,7 @@ class AM_Transients_Manager {
 	 * Retrieve transients from the database
 	 *
 	 * @since  1.0
+	 * @param  array $args
 	 * @return array
 	 */
 	private function get_transients( $args = array() ) {
@@ -557,9 +528,9 @@ class AM_Transients_Manager {
 				$sql    .= " AND option_name LIKE '%{$search}%'";
 			}
 
-			$offset = absint( $args['offset'] );
-			$number = absint( $args['number'] );
-			$sql .= " ORDER BY option_id DESC LIMIT $offset,$number;";
+			$offset  = absint( $args['offset'] );
+			$number  = absint( $args['number'] );
+			$sql    .= " ORDER BY option_id DESC LIMIT {$offset}, {$number};";
 
 			$transients = $wpdb->get_results( $sql );
 
@@ -575,6 +546,7 @@ class AM_Transients_Manager {
 	 * If a search is performed, it returns the number of found results
 	 *
 	 * @since  1.0
+	 * @param  string $search
 	 * @return int
 	 */
 	private function get_total_transients( $search = '' ) {
@@ -609,6 +581,7 @@ class AM_Transients_Manager {
 	 * Retrieve a transient by its ID
 	 *
 	 * @since  1.0
+	 * @param  int $id
 	 * @return object
 	 */
 	private function get_transient_by_id( $id = 0 ) {
@@ -650,6 +623,7 @@ class AM_Transients_Manager {
 	 * Retrieve the human-friendly transient value from the transient object
 	 *
 	 * @since  1.0
+	 * @param  object $transient
 	 * @return string/int
 	 */
 	private function get_transient_value( $transient ) {
@@ -660,22 +634,22 @@ class AM_Transients_Manager {
 
 		$value = is_scalar( $value )
 			? '<code>' . wp_trim_words( $value, 5 ) . '</code>'
-			: __( '&mdash;', 'transients-manager' );
+			: '&mdash;';
 
-		return $value . '<br>' . sprintf( __( 'Type: %s', 'transients-manager' ), $type );
+		return $value . '<br><span class="transient-type badge">' . esc_html( $type ) . '</span>';
 	}
 
 	/**
 	 * Try to guess the type of value the Transient is
 	 *
-	 * @since 2.0
-	 * @param object $transient
+	 * @since  2.0
+	 * @param  object $transient
 	 * @return string
 	 */
 	private function get_transient_value_type( $transient ) {
 
 		// Default type
-		$type = 'unknown';
+		$type = __( 'unknown', 'transients-manager' );
 
 		// Try to unserialize
 		$value = maybe_unserialize( $transient->option_value );
@@ -702,7 +676,25 @@ class AM_Transients_Manager {
 
 		// Scalar
 		} elseif ( is_scalar( $value ) ) {
-			$type = __( 'scalar', 'transients-manager' );
+
+			if ( is_numeric( $value ) ) {
+
+				// Likely a timestamp
+				if ( 10 === strlen( $value ) ) {
+					$type = __( 'timestamp?', 'transients-manager' );
+
+				// Likely a boolean
+				} elseif ( in_array( $value, array( '0', '1' ), true ) ) {
+					$type = __( 'boolean?', 'transients-manager' );
+
+				// Any number
+				} else {
+					$type = __( 'numeric', 'transients-manager' );
+				}
+
+			} else {
+				$type = __( 'scalar', 'transients-manager' );
+			}
 
 		// Empty
 		} elseif ( empty( $value ) ) {
@@ -717,6 +709,7 @@ class AM_Transients_Manager {
 	 * Retrieve the expiration timestamp
 	 *
 	 * @since  1.0
+	 * @param  object $transient
 	 * @return int
 	 */
 	private function get_transient_expiration_time( $transient ) {
@@ -737,16 +730,16 @@ class AM_Transients_Manager {
 	 * Retrieve the human-friendly expiration time
 	 *
 	 * @since  1.0
+	 * @param  object $transient
 	 * @return string
 	 */
 	private function get_transient_expiration( $transient ) {
 
-		$time_now   = time();
 		$expiration = $this->get_transient_expiration_time( $transient );
 
 		// Bail if no expiration
 		if ( empty( $expiration ) ) {
-			return '&mdash;';
+			return '&mdash;<br><span class="badge">' . __( 'Persistent', 'transients-manager' ) . '</span>';
 		}
 
 		// UTC & local dates
@@ -755,25 +748,24 @@ class AM_Transients_Manager {
 
 		// Create <time> tag
 		$time = sprintf(
-			'<time datetime="%1$s" title="%1$s">%2$s</time><br>',
+			'<time datetime="%1$s" title="%1$s">%2$s</time>',
 			esc_attr( $date_utc ),
 			esc_html( $date_local )
 		);
 
 		// Expired
-		if ( $time_now > $expiration ) {
-			return $time . '<span class="transient-expired">' . __( 'Expired', 'transients-manager' ) . '</span>';
+		if ( $this->time_now > $expiration ) {
+			return $time . '<br><span class="transient-expired badge">' . __( 'Expired', 'transients-manager' ) . '</span>';
 		}
 
 		// Return time since
-		return $time . $this->time_since( $expiration - $time_now );
+		return $time . '<br><span class="badge green">' . $this->time_since( $expiration - $this->time_now ) . '</span>';
 	}
 
 	/**
 	 * Process delete and update actions
 	 *
-	 * @since  1.0
-	 * @return void
+	 * @since 1.0
 	 */
 	public function process_actions() {
 
@@ -819,37 +811,88 @@ class AM_Transients_Manager {
 
 			case 'delete_transient' :
 				$this->delete_transient( $transient, $site_wide );
-				wp_safe_redirect( admin_url( 'tools.php?page=' . $this->page_id . '&s=' . $search ) );
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page' => $this->page_id,
+							's'    => $search
+						),
+						admin_url( 'tools.php' )
+					)
+				);
 				exit;
 
 			case 'update_transient' :
 				$this->update_transient( $transient, $site_wide );
-				wp_safe_redirect( admin_url( 'tools.php?page=' . $this->page_id . '&s=' . $search ) );
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page' => $this->page_id,
+							's'    => $search
+						),
+						admin_url( 'tools.php' )
+					)
+				);
 				exit;
 
 			case 'delete_selected_transients' :
 				$this->delete_selected_transients();
-				wp_safe_redirect( admin_url( 'tools.php?page=' . $this->page_id . '' ) );
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page' => $this->page_id
+						),
+						admin_url( 'tools.php' )
+					)
+				);
 				exit;
 
 			case 'delete_expired_transients' :
 				$this->delete_expired_transients();
-				wp_safe_redirect( admin_url( 'tools.php?page=' . $this->page_id . '' ) );
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page' => $this->page_id
+						),
+						admin_url( 'tools.php' )
+					)
+				);
 				exit;
 
 			case 'delete_transients_with_expiration' :
 				$this->delete_transients_with_expirations();
-				wp_safe_redirect( admin_url( 'tools.php?page=' . $this->page_id . '' ) );
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page' => $this->page_id
+						),
+						admin_url( 'tools.php' )
+					)
+				);
 				exit;
 
 			case 'delete_transients_without_expiration' :
 				$this->delete_transients_without_expirations();
-				wp_safe_redirect( admin_url( 'tools.php?page=' . $this->page_id . '' ) );
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page' => $this->page_id
+						),
+						admin_url( 'tools.php' )
+					)
+				);
 				exit;
 
 			case 'delete_all_transients' :
 				$this->delete_all_transients();
-				wp_safe_redirect( admin_url( 'tools.php?page=' . $this->page_id . '' ) );
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page' => $this->page_id
+						),
+						admin_url( 'tools.php' )
+					)
+				);
 				exit;
 		}
 	}
@@ -858,6 +901,8 @@ class AM_Transients_Manager {
 	 * Delete a transient by name
 	 *
 	 * @since  1.0
+	 * @param  object $transient
+	 * @param  boolean $site_wide
 	 * @return boolean
 	 */
 	private function delete_transient( $transient = '', $site_wide = false ) {
@@ -881,6 +926,7 @@ class AM_Transients_Manager {
 	 * Bulk delete function
 	 *
 	 * @since  1.5
+	 * @param  array $transients
 	 * @return boolean
 	 */
 	private function bulk_delete_transients( $transients = array() ) {
@@ -944,11 +990,8 @@ class AM_Transients_Manager {
 	public function delete_expired_transients() {
 		global $wpdb;
 
-		// Now
-		$time_now = time();
-
 		// Query
-		$expired  = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} where option_name LIKE '%_transient_timeout_%' AND option_value+0 < {$time_now}" );
+		$expired  = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} where option_name LIKE '%_transient_timeout_%' AND option_value+0 < {$this->time_now}" );
 
 		// Bulk delete
 		return $this->bulk_delete_transients( $expired );
@@ -1025,6 +1068,8 @@ class AM_Transients_Manager {
 	 * Update an existing transient
 	 *
 	 * @since  1.0
+	 * @param  object  $transient
+	 * @param  boolean $site_wide
 	 * @return boolean
 	 */
 	private function update_transient( $transient = '', $site_wide = false ) {
@@ -1039,7 +1084,7 @@ class AM_Transients_Manager {
 		$expiration = sanitize_text_field( $_POST['expires'] );
 
 		// Subtract now
-		$expiration = $expiration - time();
+		$expiration = $expiration - $this->time_now;
 
 		// Site
 		if ( false !== $site_wide ) {
@@ -1055,7 +1100,9 @@ class AM_Transients_Manager {
 	 * Prevent transient from being updated if transients are suspended
 	 *
 	 * @since  1.6
-	 * @return boolean
+	 * @param  mixed  $value
+	 * @param  string $option
+	 * @return mixed
 	 */
 	public function maybe_block_update_transient( $value = '', $option = '' ) {
 
@@ -1076,8 +1123,7 @@ class AM_Transients_Manager {
 	/**
 	 * Prevent transient from being updated if transients are suspended
 	 *
-	 * @since  1.6
-	 * @return boolean
+	 * @since 1.6
 	 */
 	public function maybe_block_set_transient( $option = '' ) {
 
@@ -1164,6 +1210,133 @@ class AM_Transients_Manager {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Add <style> tag to "admin_print_styles-{$this->page_id}" hook
+	 *
+	 * @since 2.0
+	 */
+	public function print_styles() {
+
+		// Escape once
+		$esc = esc_attr( $this->page_id ); ?>
+
+<style type="text/css" id="transients-manager">
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .column-value {
+		width: 38%;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .column-expiration {
+		width: 170px;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .truncate {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients .column-primary pre {
+		margin: 0;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.transient-value {
+		display: block;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients code {
+		background: transparent;
+		margin: 0;
+		padding: 0;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.transient-value,
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.transient-expiration {
+		cursor: default;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.badge,
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients div.row-actions {
+		margin-top: 5px;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.badge {
+		padding: 2px 7px;
+		border-radius: 4px;
+		display: inline-flex;
+		align-items: center;
+		background: rgba(0, 0, 0, 0.07);
+		color: #50575e;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.badge.green {
+		color: #017d5c;
+		background: #e5f5f0;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> table.transients span.transient-expired {
+		color: #b32d2e;
+		background: #ffd6d6;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> .tablenav .info {
+		display: inline-block;
+		margin: 2px 0;
+		padding: 2px 7px;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> .tablenav-pages span.displaying-num {
+		display: inline-block;
+		margin: 5px 0;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links .page-numbers {
+		border-color: #7e8993;
+		color: #32373c;
+		display: inline-block;
+		vertical-align: baseline;
+		min-width: 30px;
+		min-height: 30px;
+		text-decoration: none;
+		text-align: center;
+		font-size: 13px;
+		line-height: 2.15384615;
+		margin: 0;
+		padding: 0 10px;
+		cursor: pointer;
+		border-width: 1px;
+		border-style: solid;
+		border-radius: 3px;
+		-webkit-appearance: none;
+		white-space: nowrap;
+		box-sizing: border-box;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links .page-numbers.next,
+	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links .page-numbers.prev {
+		font-size: 16px;
+		line-height: 1.625;
+		padding: 0 4px;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links a.page-numbers:hover {
+		background-color: #f0f0f1;
+		border-color: #717c87;
+		color: #262a2e;
+	}
+
+	body.tools_page_<?php echo $esc; // Escaped ?> span.pagination-links span.page-numbers {
+		color: #a7aaad;
+		border-color: #dcdcde;
+		background: #f6f7f7;
+		box-shadow: none;
+		cursor: default;
+		transform: none;
+	}
+</style>
+
+<?php
 	}
 }
 

@@ -5,13 +5,13 @@ Author URI:        https://www.wpbeginner.com
 Plugin URI:        https://wordpress.org/plugins/transients-manager/
 License URI:       http://www.gnu.org/licenses/gpl-2.0.html
 License:           GNU General Public License v2 or later
-Tags:              tool, transient
+Tags:              cron, tool, transient
 Requires PHP:      5.6.20
-Requires at least: 5.0
+Requires at least: 5.3
 Tested up to:      5.9
-Stable Tag:        1.8.1
+Stable Tag:        2.0.0
 
-Provides an interface to manage to view, search, edit, and delete Transients.
+Provides a familiar interface to view, search, edit, and delete Transients.
 
 == Description ==
 
@@ -46,6 +46,18 @@ Have you found a bug or have a suggestion or improvement you'd like to submit? T
 Not at this time, it only works when transients are stored in the options table.
 
 == Changelog ==
+
+= 2.0.0 - December 15, 2021 =
+
+* Added: Small-screen support
+* Added: Value type hints
+* Added: Ability to delete all without expiration
+* Added: Site & Auto clean timestamps
+* Improved: Bulk actions
+* Improved: List table styling
+* Improved: Pagination styling
+* Improved: Truncation of large keys & values
+* Improved: Security & performance
 
 = 1.8.1 - July 30, 2019 =
 
