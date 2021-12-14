@@ -260,7 +260,7 @@ class AM_Transients_Manager {
 
 							<td class="column-primary" data-colname="<?php _e( 'Name', 'transients-manager' ); ?>">
 								<pre class="truncate">
-									<code class="transient-name" title="<?php echo (int) $transient->option_id; ?>"><?php echo esc_html( $name ); ?></code>
+									<code class="transient-name" title="<?php printf( __( 'Option ID: %d', 'transients-manager' ), (int) $transient->option_id ); ?>"><?php echo esc_html( $name ); ?></code>
 								</pre>
 
 								<div class="row-actions">
