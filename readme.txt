@@ -1,8 +1,12 @@
 === Transients Manager ===
+Contributors:      wpbeginner, smub, mordauk, johnjamesjacoby
+Author:            WPBeginner
+Author URI:        https://www.wpbeginner.com
 Plugin URI:        https://wordpress.org/plugins/transients-manager/
-Author URI:        https://awesomemotive.com
-Contributors:      mordauk, johnjamesjacoby
-Tags:              tool, transients
+License URI:       http://www.gnu.org/licenses/gpl-2.0.html
+License:           GNU General Public License v2 or later
+Tags:              tool, transient
+Requires PHP:      5.6.20
 Requires at least: 5.0
 Tested up to:      5.9
 Stable Tag:        1.8.1
