@@ -53,6 +53,7 @@ class AM_Transients_Manager {
 		add_action( 'admin_init',        array( $this, 'set_times' ) );
 		add_action( 'admin_init',        array( $this, 'process_actions' ) );
 		add_action( 'admin_menu',        array( $this, 'tools_link' ) );
+		add_action( 'admin_notices',     array( $this, 'notices' ) );
 		add_action( 'admin_bar_menu',    array( $this, 'suspend_transients_button' ), 999 );
 		add_filter( 'pre_update_option', array( $this, 'maybe_block_update_transient' ), -1, 2 );
 		add_filter( 'pre_get_option',    array( $this, 'maybe_block_update_transient' ), -1, 2 );
@@ -88,7 +89,8 @@ class AM_Transients_Manager {
 	 */
 	public function tools_link() {
 
-		add_management_page(
+		// Set the screen ID
+		$this->screen_id = add_management_page(
 			__( 'Transients Manager', 'transients-manager' ),
 			__( 'Transients', 'transients-manager' ),
 			'manage_options',
@@ -127,6 +129,55 @@ class AM_Transients_Manager {
 		( 'edit' === $this->page_type() )
 			? $this->page_edit_transient()
 			: $this->page_show_transients();
+	}
+
+	/**
+	 * Admin notices
+	 *
+	 * @since 2.0
+	 */
+	public function notices() {
+
+		// Get the current screen
+		$screen = get_current_screen();
+
+		// Bail if not the correct screen
+		if ( $screen->id !== $this->screen_id ) {
+			return;
+		}
+
+		// Persistent Transients
+		if ( wp_using_ext_object_cache() ) :
+
+?>
+<div class="notice notice-info">
+	<p><?php _e( 'You are using a persistent object cache. This screen may show incomplete information.', 'transients-manager' ); ?></p>
+</div>
+<?php
+
+		endif;
+
+		// Updated Transient
+		if ( ! empty( $_GET['updated'] ) ) :
+
+?>
+<div class="notice notice-success is-dismissible">
+	<p><strong><?php _e( 'Trasient updated.', 'transients-manager' ); ?></strong></p>
+</div>
+<?php
+
+		endif;
+
+		// Deleted Transients
+		if ( ! empty( $_GET['deleted'] ) ) :
+
+?>
+<div class="notice notice-success is-dismissible">
+	<p><strong><?php _e( 'Trasient deleted.', 'transients-manager' ); ?></strong></p>
+</div>
+<?php
+
+		endif;
 	}
 
 	/**
@@ -234,21 +285,27 @@ class AM_Transients_Manager {
 
 						// Delete
 						$delete_url = wp_nonce_url(
-							add_query_arg(
-								array(
-									'action'    => 'delete_transient',
-									'transient' => $name,
-									'name'      => $transient->option_name
+							remove_query_arg(
+								array( 'deleted', 'updated' ),
+								add_query_arg(
+									array(
+										'action'    => 'delete_transient',
+										'transient' => $name,
+										'name'      => $transient->option_name
+									)
 								)
 							),
 							'transients_manager'
 						);
 
 						// Edit
-						$edit_url = add_query_arg(
-							array(
-								'action'   => 'edit_transient',
-								'trans_id' => $transient->option_id
+						$edit_url = remove_query_arg(
+							array( 'updated', 'deleted' ),
+							add_query_arg(
+								array(
+									'action'   => 'edit_transient',
+									'trans_id' => $transient->option_id
+								)
 							)
 						); ?>
 
@@ -381,7 +438,11 @@ class AM_Transients_Manager {
 				</tr>
 				<tr>
 					<th><?php _e( 'Value', 'transients-manager' ); ?></th>
-					<td><textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px;"><?php echo esc_textarea( $transient->option_value ); ?></textarea></td>
+					<td>
+						<textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px;"><?php
+							echo esc_textarea( $transient->option_value );
+						?></textarea>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -666,14 +727,18 @@ class AM_Transients_Manager {
 	 */
 	private function get_transient_value( $transient ) {
 
-		$value = maybe_unserialize( $transient->option_value );
-
+		// Get the value type
 		$type = $this->get_transient_value_type( $transient );
 
+		// Maybe unserialize
+		$value = maybe_unserialize( $transient->option_value );
+
+		// Trim or dash
 		$value = is_scalar( $value )
 			? '<code>' . wp_trim_words( $value, 5 ) . '</code>'
 			: '&mdash;';
 
+		// Return
 		return $value . '<br><span class="transient-type badge">' . esc_html( $type ) . '</span>';
 	}
 
@@ -839,23 +904,27 @@ class AM_Transients_Manager {
 
 			case 'suspend_transients' :
 				update_option( 'pw_tm_suspend', 1 );
-				wp_safe_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) );
+				wp_safe_redirect( remove_query_arg( array( 'updated', 'deleted', 'action', '_wpnonce' ) ) );
 				exit;
 
 			case 'unsuspend_transients' :
 				delete_option( 'pw_tm_suspend', 1 );
-				wp_safe_redirect( remove_query_arg( array( 'action', '_wpnonce' ) ) );
+				wp_safe_redirect( remove_query_arg( array( 'updated', 'deleted', 'action', '_wpnonce' ) ) );
 				exit;
 
 			case 'delete_transient' :
 				$this->delete_transient( $transient, $site_wide );
 				wp_safe_redirect(
-					add_query_arg(
-						array(
-							'page' => $this->page_id,
-							's'    => $search
-						),
-						admin_url( 'tools.php' )
+					remove_query_arg(
+						array( 'updated' ),
+						add_query_arg(
+							array(
+								'page'    => $this->page_id,
+								's'       => $search,
+								'deleted' => true
+							),
+							admin_url( 'tools.php' )
+						)
 					)
 				);
 				exit;
@@ -863,12 +932,16 @@ class AM_Transients_Manager {
 			case 'update_transient' :
 				$this->update_transient( $transient, $site_wide );
 				wp_safe_redirect(
-					add_query_arg(
-						array(
-							'page' => $this->page_id,
-							's'    => $search
-						),
-						admin_url( 'tools.php' )
+					remove_query_arg(
+						array( 'deleted' ),
+						add_query_arg(
+							array(
+								'page'    => $this->page_id,
+								's'       => $search,
+								'updated' => true
+							),
+							admin_url( 'tools.php' )
+						)
 					)
 				);
 				exit;
@@ -876,11 +949,15 @@ class AM_Transients_Manager {
 			case 'delete_selected_transients' :
 				$this->delete_selected_transients();
 				wp_safe_redirect(
-					add_query_arg(
-						array(
-							'page' => $this->page_id
-						),
-						admin_url( 'tools.php' )
+					remove_query_arg(
+						array( 'updated' ),
+						add_query_arg(
+							array(
+								'page'    => $this->page_id,
+								'deleted' => true
+							),
+							admin_url( 'tools.php' )
+						)
 					)
 				);
 				exit;
@@ -888,11 +965,15 @@ class AM_Transients_Manager {
 			case 'delete_expired_transients' :
 				$this->delete_expired_transients();
 				wp_safe_redirect(
-					add_query_arg(
-						array(
-							'page' => $this->page_id
-						),
-						admin_url( 'tools.php' )
+					remove_query_arg(
+						array( 'updated' ),
+						add_query_arg(
+							array(
+								'page'    => $this->page_id,
+								'deleted' => true
+							),
+							admin_url( 'tools.php' )
+						)
 					)
 				);
 				exit;
@@ -900,11 +981,15 @@ class AM_Transients_Manager {
 			case 'delete_transients_with_expiration' :
 				$this->delete_transients_with_expirations();
 				wp_safe_redirect(
-					add_query_arg(
-						array(
-							'page' => $this->page_id
-						),
-						admin_url( 'tools.php' )
+					remove_query_arg(
+						array( 'updated' ),
+						add_query_arg(
+							array(
+								'page'    => $this->page_id,
+								'deleted' => true
+							),
+							admin_url( 'tools.php' )
+						)
 					)
 				);
 				exit;
@@ -912,11 +997,15 @@ class AM_Transients_Manager {
 			case 'delete_transients_without_expiration' :
 				$this->delete_transients_without_expirations();
 				wp_safe_redirect(
-					add_query_arg(
-						array(
-							'page' => $this->page_id
-						),
-						admin_url( 'tools.php' )
+					remove_query_arg(
+						array( 'updated' ),
+						add_query_arg(
+							array(
+								'page'    => $this->page_id,
+								'deleted' => true
+							),
+							admin_url( 'tools.php' )
+						)
 					)
 				);
 				exit;
@@ -924,11 +1013,15 @@ class AM_Transients_Manager {
 			case 'delete_all_transients' :
 				$this->delete_all_transients();
 				wp_safe_redirect(
-					add_query_arg(
-						array(
-							'page' => $this->page_id
-						),
-						admin_url( 'tools.php' )
+					remove_query_arg(
+						array( 'updated' ),
+						add_query_arg(
+							array(
+								'page'    => $this->page_id,
+								'deleted' => true
+							),
+							admin_url( 'tools.php' )
+						)
 					)
 				);
 				exit;
@@ -1133,11 +1226,11 @@ class AM_Transients_Manager {
 		}
 
 		// Values
-		$value      = sanitize_text_field( $_POST['value'] );
-		$expiration = sanitize_text_field( $_POST['expires'] );
+		$value      = stripslashes( $_POST['value'] );
+		$expiration = absint( stripslashes( $_POST['expires'] ) );
 
 		// Subtract now
-		$expiration = $expiration - $this->time_now;
+		$expiration = ( $expiration - $this->time_now );
 
 		// Transient type
 		$retval = ( false !== $site_wide )
