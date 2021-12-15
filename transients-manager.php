@@ -25,7 +25,7 @@ class AM_Transients_Manager {
 	 * @since 2.0
 	 * @var string
 	 */
-	public $page_id = 'pw-transients-manager';
+	public $page_id = 'transients-manager';
 
 	/**
 	 * Timestamp for right now
@@ -36,7 +36,7 @@ class AM_Transients_Manager {
 	public $time_now = 0;
 
 	/**
-	 * Timestamp of the next time WP Cron will delete expired transients
+	 * Timestamp of the next time WPCron will delete expired transients
 	 *
 	 * @since 2.0
 	 * @var int
@@ -50,8 +50,8 @@ class AM_Transients_Manager {
 	 */
 	public function __construct() {
 		add_action( 'plugins_loaded',    array( $this, 'text_domain' ) );
-		add_action( 'admin_init',        array( $this, 'process_actions' ) );
 		add_action( 'admin_init',        array( $this, 'set_times' ) );
+		add_action( 'admin_init',        array( $this, 'process_actions' ) );
 		add_action( 'admin_menu',        array( $this, 'tools_link' ) );
 		add_action( 'admin_bar_menu',    array( $this, 'suspend_transients_button' ), 999 );
 		add_filter( 'pre_update_option', array( $this, 'maybe_block_update_transient' ), -1, 2 );
@@ -368,7 +368,7 @@ class AM_Transients_Manager {
 		<table class="form-table">
 			<tbody>
 				<tr>
-					<th><?php _e( 'ID', 'transients-manager' ); ?></th>
+					<th><?php _e( 'Option ID', 'transients-manager' ); ?></th>
 					<td><input type="text" disabled class="large-text code" name="name" value="<?php echo esc_attr( $transient->option_id ); ?>" /></td>
 				</tr>
 				<tr>
@@ -510,7 +510,10 @@ class AM_Transients_Manager {
 	}
 
 	/**
-	 * Retrieve transients from the database
+	 * Get transients from the database
+	 *
+	 * These queries are uncached, to prevent race conditions with persistent
+	 * object cache setups and the way Transients use them.
 	 *
 	 * @since  1.0
 	 * @param  array $args
@@ -519,35 +522,73 @@ class AM_Transients_Manager {
 	private function get_transients( $args = array() ) {
 		global $wpdb;
 
-		$defaults = array(
-			'offset' => 0,
-			'number' => 30,
-			'search' => ''
-		);
+		// Parse arguments
+		$r = $this->parse_args( $args );
 
-		$args       = wp_parse_args( $args, $defaults );
-		$cache_key  = md5( serialize( $args ) );
-		$transients = wp_cache_get( $cache_key );
+		// Escape some LIKE parts
+		$esc_name = '%' . $wpdb->esc_like( '_transient_'         ) . '%';
+		$esc_time = '%' . $wpdb->esc_like( '_transient_timeout_' ) . '%';
 
-		if ( false === $transients ) {
+		// SELECT
+		$sql = array( 'SELECT' );
 
-			$sql = "SELECT * FROM {$wpdb->options} WHERE option_name LIKE '%\_transient\_%' AND option_name NOT LIKE '%\_transient\_timeout%'";
-
-			if ( ! empty( $args['search'] ) ) {
-				$search  = esc_sql( $args['search'] );
-				$sql    .= " AND option_name LIKE '%{$search}%'";
-			}
-
-			$offset  = absint( $args['offset'] );
-			$number  = absint( $args['number'] );
-			$sql    .= " ORDER BY option_id DESC LIMIT {$offset}, {$number};";
-
-			$transients = $wpdb->get_results( $sql );
-
-			wp_cache_set( $cache_key, $transients, '', 3600 );
+		// COUNT
+		if ( ! empty( $r['count'] ) ) {
+			$sql[] = 'count(option_id)';
+		} else {
+			$sql[] = '*';
 		}
 
+		// FROM
+		$sql[] = "FROM {$wpdb->options} WHERE option_name LIKE %s AND option_name NOT LIKE %s";
+
+		// Search
+		if ( ! empty( $r['search'] ) ) {
+			$search = '%' . $wpdb->esc_like( $r['search'] ) . '%';
+			$sql[]  = $wpdb->prepare( "AND option_name LIKE %s", $search );
+		}
+
+		// Limits
+		if ( empty( $r['count'] ) ) {
+			$offset = absint( $r['offset'] );
+			$number = absint( $r['number'] );
+			$sql[]  = $wpdb->prepare( "ORDER BY option_id DESC LIMIT %d, %d", $offset, $number );
+		}
+
+		// Combine the SQL parts
+		$query = implode( ' ', $sql );
+
+		// Prepare
+		$prepared = $wpdb->prepare( $query, $esc_name, $esc_time );
+
+		// Query
+		$transients = empty( $r['count'] )
+			? $wpdb->get_results( $prepared ) // Rows
+			: $wpdb->get_var( $prepared );    // Count
+
+		// Return transients
 		return $transients;
+	}
+
+	/**
+	 * Parse the query arguments
+	 *
+	 * @since 2.0
+	 * @param array $args
+	 * @return array
+	 */
+	private function parse_args( $args = array() ) {
+
+		// Parse
+		$r = wp_parse_args( $args, array(
+			'offset' => 0,
+			'number' => 30,
+			'search' => '',
+			'count'  => false
+		) );
+
+		// Return
+		return $r;
 	}
 
 	/**
@@ -560,31 +601,15 @@ class AM_Transients_Manager {
 	 * @return int
 	 */
 	private function get_total_transients( $search = '' ) {
-		global $wpdb;
 
-		if ( ! empty( $search ) ) {
+		// Query
+		$count = $this->get_transients( array(
+			'count'  => true,
+			'search' => $search
+		) );
 
-			$count = wp_cache_get( 'pw_transients_count_' . sanitize_key( $search ) );
-
-			if ( false === $count ) {
-				$search = esc_sql( $search );
-				$count  = $wpdb->get_var( "SELECT count(option_id) FROM {$wpdb->options} WHERE option_name LIKE '%\_transient\_%' AND option_name NOT LIKE '%\_transient\_timeout%' AND option_name LIKE '%{$search}%'" );
-
-				wp_cache_set( 'pw_transients_' . sanitize_key( $search ), $count, '', 3600 );
-			}
-
-		} else {
-
-			$count = wp_cache_get( 'pw_transients_count' );
-
-			if ( false === $count ) {
-				$count = $wpdb->get_var( "SELECT count(option_id) FROM {$wpdb->options} WHERE option_name LIKE '%\_transient\_%' AND option_name NOT LIKE '%\_transient\_timeout%'" );
-
-				wp_cache_set( 'pw_transients_count', $count, '', 3600 );
-			}
-		}
-
-		return $count;
+		// Return int
+		return absint( $count );
 	}
 
 	/**
@@ -604,8 +629,11 @@ class AM_Transients_Manager {
 			return false;
 		}
 
+		// Prepare
+		$prepared = $wpdb->prepare( "SELECT * FROM {$wpdb->options} WHERE option_id = %d", $id );
+
 		// Query
-		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->options} WHERE option_id = %d", $id ) );
+		return $wpdb->get_row( $prepared );
 	}
 
 	/**
@@ -922,14 +950,13 @@ class AM_Transients_Manager {
 			return false;
 		}
 
-		// Site
-		if ( false !== $site_wide ) {
-			return delete_site_transient( $transient );
+		// Transient type
+		$retval = ( false !== $site_wide )
+			? delete_site_transient( $transient )
+			: delete_transient( $transient );
 
-		// Normal
-		} else {
-			return delete_transient( $transient );
-		}
+		// Return
+		return $retval;
 	}
 
 	/**
@@ -949,7 +976,7 @@ class AM_Transients_Manager {
 		// Loop through Transients, and delete them
 		foreach ( $transients as $transient ) {
 			$site_wide = ( false !== strpos( $transient, '_site_transient' ) );
-			$prefix    = $site_wide ? '_site_transient_timeout_' : '_transient_timeout_';
+			$prefix    = ! empty( $site_wide ) ? '_site_transient_timeout_' : '_transient_timeout_';
 			$name      = str_replace( $prefix, '', $transient );
 
 			// Delete
@@ -1001,7 +1028,9 @@ class AM_Transients_Manager {
 		global $wpdb;
 
 		// Query
-		$expired  = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} where option_name LIKE '%_transient_timeout_%' AND option_value+0 < {$this->time_now}" );
+		$esc_time = '%' . $wpdb->esc_like( '_transient_timeout_' ) . '%';
+		$prepared = $wpdb->prepare( "SELECT option_name FROM {$wpdb->options} where option_name LIKE %s AND option_value+0 < %d", $esc_time, $this->time_now );
+		$expired  = $wpdb->get_col( $prepared );
 
 		// Bulk delete
 		return $this->bulk_delete_transients( $expired );
@@ -1017,7 +1046,9 @@ class AM_Transients_Manager {
 		global $wpdb;
 
 		// Query
-		$will_expire = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} where option_name LIKE '%_transient_timeout_%'" );
+		$esc_time    = '%' . $wpdb->esc_like( '_transient_timeout_' ) . '%';
+		$prepared    = $wpdb->prepare( "SELECT option_name FROM {$wpdb->options} where option_name LIKE %s", $esc_time );
+		$will_expire = $wpdb->get_col( $prepared );
 
 		// Bulk delete
 		return $this->bulk_delete_transients( $will_expire );
@@ -1032,9 +1063,13 @@ class AM_Transients_Manager {
 	public function delete_transients_without_expirations() {
 		global $wpdb;
 
+		// Escape likes
+		$esc_time = '%' . $wpdb->esc_like( '_transient_timeout_' ) . '%';
+		$esc_name = '%' . $wpdb->esc_like( '_transient_'         ) . '%';
+
 		// Queries
-		$timeouts = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} where option_name LIKE '%_transient_timeout_%'" );
-		$names    = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} where option_name LIKE '%_transient_%'" );
+		$timeouts = $wpdb->get_col( $wpdb->prepare( "SELECT option_name FROM {$wpdb->options} where option_name LIKE %s", $esc_time ) );
+		$names    = $wpdb->get_col( $wpdb->prepare( "SELECT option_name FROM {$wpdb->options} where option_name LIKE %s", $esc_name ) );
 
 		// Diff to remove timeouts from names
 		$items = array_diff( $names, $timeouts );
@@ -1066,11 +1101,19 @@ class AM_Transients_Manager {
 	public function delete_all_transients() {
 		global $wpdb;
 
+		// Escape like
+		$esc_name = '%' . $wpdb->esc_like( '_transient_' ) . '%';
+
+		// Query
 		$count = $wpdb->query(
-			"DELETE FROM {$wpdb->options}
-			WHERE option_name LIKE '\_transient\_%'"
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options}
+				WHERE option_name LIKE %s"
+			),
+			$esc_name
 		);
 
+		// Return count
 		return $count;
 	}
 
@@ -1096,14 +1139,13 @@ class AM_Transients_Manager {
 		// Subtract now
 		$expiration = $expiration - $this->time_now;
 
-		// Site
-		if ( false !== $site_wide ) {
-			return set_site_transient( $transient, $value, $expiration );
+		// Transient type
+		$retval = ( false !== $site_wide )
+			? set_site_transient( $transient, $value, $expiration )
+			: set_transient( $transient, $value, $expiration );
 
-		// Normal
-		} else {
-			return set_transient( $transient, $value, $expiration );
-		}
+		// Return
+		return $retval;
 	}
 
 	/**
