@@ -112,7 +112,7 @@ No. It only works when transients are stored in the database.
 
 = 1.8 - November 20, 2019 =
 
-* New: Added support for bulk deleting selected transients, props to Ash0ur
+* New: Added support for bulk deleting selected transients, props @ash0ur
 
 = 1.7.7 - April 28, 2019 =
 
