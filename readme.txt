@@ -96,6 +96,9 @@ No. It only works when transients are stored in the database.
 * Added: Value type hints
 * Added: Ability to delete all without expiration
 * Added: Site & Auto clean timestamps
+* Added: CodeMirror support when editing
+* Added: Notices on successful save & delete
+* Added: Notice when using object caching
 * Improved: Bulk actions
 * Improved: List table styling
 * Improved: Pagination styling
