@@ -23,15 +23,23 @@ class AM_Transients_Manager {
 	 * ID of the plugin page
 	 *
 	 * @since 2.0
-	 * @var string
+	 * @var   string
 	 */
 	public $page_id = 'transients-manager';
+
+	/**
+	 * Capability the current-user needs to manage transients
+	 *
+	 * @since 2.0
+	 * @var   string
+	 */
+	public $capability = 'manage_options';
 
 	/**
 	 * Timestamp for right now
 	 *
 	 * @since 2.0
-	 * @var int
+	 * @var   int
 	 */
 	public $time_now = 0;
 
@@ -39,7 +47,7 @@ class AM_Transients_Manager {
 	 * Timestamp of the next time WPCron will delete expired transients
 	 *
 	 * @since 2.0
-	 * @var int
+	 * @var   int
 	 */
 	public $next_cron_delete = 0;
 
@@ -49,28 +57,62 @@ class AM_Transients_Manager {
 	 * @since 1.0
 	 */
 	public function __construct() {
+		$this->add_hooks();
+	}
+
+	/**
+	 * Add all of the hooks
+	 *
+	 * @since 2.0
+	 */
+	private function add_hooks() {
 		add_action( 'plugins_loaded',    array( $this, 'text_domain' ) );
-		add_action( 'admin_init',        array( $this, 'set_times' ) );
+		add_action( 'admin_init',        array( $this, 'set_vars' ) );
 		add_action( 'admin_init',        array( $this, 'process_actions' ) );
 		add_action( 'admin_menu',        array( $this, 'tools_link' ) );
 		add_action( 'admin_notices',     array( $this, 'notices' ) );
-		add_action( 'admin_bar_menu',    array( $this, 'suspend_transients_button' ), 999 );
+		add_action( 'admin_bar_menu',    array( $this, 'suspend_transients_button' ), 99 );
 		add_filter( 'pre_update_option', array( $this, 'maybe_block_update_transient' ), -1, 2 );
 		add_filter( 'pre_get_option',    array( $this, 'maybe_block_update_transient' ), -1, 2 );
 		add_action( 'added_option',      array( $this, 'maybe_block_set_transient' ), -1, 1 );
 
 		// Styles
 		add_action( "admin_print_styles-tools_page_{$this->page_id}", array( $this, 'print_styles' ) );
+
+		/**
+		 * Allow third-party plugins a chance to modify the hooks above
+		 *
+		 * @since 2.0
+		 * @param object $this
+		 */
+		do_action( 'transients_manager_hooks', $this );
 	}
 
 	/**
-	 * Set the related timestamp values
+	 * Set many of the class variables
 	 *
 	 * @since 2.0
 	 */
-	public function set_times() {
+	public function set_vars() {
+
+		// Times
 		$this->time_now         = time();
 		$this->next_cron_delete = wp_next_scheduled( 'delete_expired_transients' );
+
+		// Sanitize the transient ID
+		$this->transient_id = ! empty( $_GET['trans_id'] )
+			? absint( $_GET['trans_id'] )
+			: 0;
+
+		// Get the transient
+		$this->transient = ! empty( $this->transient_id )
+			? $this->get_transient_by_id( $this->transient_id )
+			: false;
+
+		// Sanitize the action
+		$this->action = ! empty( $_REQUEST['action'] )
+			? sanitize_key( $_REQUEST['action'] )
+			: '';
 	}
 
 	/**
@@ -93,7 +135,7 @@ class AM_Transients_Manager {
 		$this->screen_id = add_management_page(
 			__( 'Transients Manager', 'transients-manager' ),
 			__( 'Transients', 'transients-manager' ),
-			'manage_options',
+			$this->capability,
 			$this->page_id,
 			array( $this, 'admin' )
 		);
@@ -102,18 +144,13 @@ class AM_Transients_Manager {
 	/**
 	 * Editing or showing?
 	 *
-	 * @since 2.0
+	 * @since  2.0
 	 * @return string
 	 */
-	public function page_type() {
-
-		// Sanitize the action
-		$action = ! empty( $_GET['action'] )
-			? sanitize_key( $_GET['action'] )
-			: '';
+	protected function page_type() {
 
 		// Edit or Show?
-		return ! empty( $action ) && ( 'edit_transient' === $action )
+		return ! empty( $this->action ) && ( 'edit_transient' === $this->action ) && ! empty( $this->transient )
 			? 'edit'
 			: 'show';
 	}
@@ -127,7 +164,7 @@ class AM_Transients_Manager {
 
 		// Editing a single Transient
 		( 'edit' === $this->page_type() )
-			? $this->page_edit_transient()
+			? $this->page_edit_transient( $this->transient )
 			: $this->page_show_transients();
 	}
 
@@ -185,7 +222,7 @@ class AM_Transients_Manager {
 	 *
 	 * @since 2.0
 	 */
-	public function page_show_transients() {
+	protected function page_show_transients() {
 
 		// Vars
 		$search   = ! empty( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
@@ -405,10 +442,9 @@ class AM_Transients_Manager {
 	 * Output the page HTML for editing a Transient
 	 *
 	 * @since 2.0
+	 * @param object $transient
 	 */
-	public function page_edit_transient() {
-		$transient_id = ! empty( $_GET['trans_id'] ) ? absint( $_GET['trans_id'] ) : 0;
-		$transient    = $this->get_transient_by_id( $transient_id );
+	protected function page_edit_transient( $transient = false) {
 
 		$name = $this->get_transient_name( $transient );
 ?>
@@ -540,20 +576,35 @@ class AM_Transients_Manager {
 	 */
 	public function suspend_transients_button( $wp_admin_bar ) {
 
-		// Bail if user cannot manage options
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Bail if user is not capable
+		if ( ! current_user_can( $this->capability ) ) {
 		    return;
 		}
 
-		$action = get_option( 'pw_tm_suspend' ) ? 'unsuspend_transients' : 'suspend_transients';
-		$label  = get_option( 'pw_tm_suspend' ) ? '<span style="color: #b32d2e;">' . __( 'Unsuspend Transients', 'transients-manager' ) . '</span>' : __( 'Suspend Transients', 'transients-manager' );
+		// Suspended
+		if ( get_option( 'pw_tm_suspend' ) ) {
+			$action = 'unsuspend_transients';
+			$label  = '<span style="color: #b32d2e;">' . __( 'Unsuspend Transients', 'transients-manager' ) . '</span>';
+
+		// Not suspended
+		} else {
+			$action = 'suspend_transients';
+			$label  = __( 'Suspend Transients', 'transients-manager' );
+		}
 
 		// Suspend
 		$wp_admin_bar->add_node( array(
 			'id'     => 'tm-suspend',
 			'title'  => $label,
 			'parent' => 'top-secondary',
-			'href'   => wp_nonce_url( add_query_arg( array( 'action' => $action ) ), 'transients_manager' )
+			'href'   => wp_nonce_url(
+				add_query_arg(
+					array(
+						'action' => $action
+					)
+				),
+				'transients_manager'
+			)
 		) );
 
 		// View
@@ -634,8 +685,8 @@ class AM_Transients_Manager {
 	/**
 	 * Parse the query arguments
 	 *
-	 * @since 2.0
-	 * @param array $args
+	 * @since  2.0
+	 * @param  array $args
 	 * @return array
 	 */
 	private function parse_args( $args = array() ) {
@@ -698,6 +749,17 @@ class AM_Transients_Manager {
 	}
 
 	/**
+	 * Is a transient name site-wide?
+	 *
+	 * @since  2.0
+	 * @param  string $transient_name
+	 * @return boolean
+	 */
+	private function is_site_wide( $transient_name = '' ) {
+		return ( false !== strpos( $transient_name, '_site_transient' ) );
+	}
+
+	/**
 	 * Retrieve the transient name from the transient object
 	 *
 	 * @since  1.0
@@ -711,7 +773,7 @@ class AM_Transients_Manager {
 		}
 
 		// Position
-		$pos = ( false !== strpos( $transient->option_name, '_site_transient' ) )
+		$pos = $this->is_site_wide( $transient->option_name )
 			? 16
 			: 11;
 
@@ -819,7 +881,7 @@ class AM_Transients_Manager {
 
 		$name = $this->get_transient_name( $transient );
 
-		if ( false !== strpos( $transient->option_name, '_site_transient' ) ) {
+		if ( $this->is_site_wide( $transient->option_name ) ) {
 			$time = get_option( "_site_transient_timeout_{$name}" );
 
 		} else {
@@ -872,20 +934,17 @@ class AM_Transients_Manager {
 	 */
 	public function process_actions() {
 
-		if ( empty( $_REQUEST['action'] ) ) {
+		if ( empty( $this->action ) ) {
 			return;
 		}
-
-		// Sanitize action
-		$action = sanitize_key( $_REQUEST['action'] );
 
 		// Bail if malformed Transient request
-		if ( empty( $_REQUEST['transient'] ) && ! in_array( $action, array( 'suspend_transients', 'unsuspend_transients' ), true ) ) {
+		if ( empty( $_REQUEST['transient'] ) && ! in_array( $this->action, array( 'suspend_transients', 'unsuspend_transients' ), true ) ) {
 			return;
 		}
 
-		// Bail if cannot manage options
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Bail if user is not capable
+		if ( ! current_user_can( $this->capability ) ) {
 			return;
 		}
 
@@ -894,13 +953,21 @@ class AM_Transients_Manager {
 			return;
 		}
 
-		if ( ! in_array( $action, array( 'suspend_transients', 'unsuspend_transients' ), true ) ) {
-			$search    = ! empty( $_REQUEST['s'] ) ? urlencode( $_REQUEST['s'] ) : '';
+		if ( ! in_array( $this->action, array( 'suspend_transients', 'unsuspend_transients' ), true ) ) {
+
+			// Encode search string
+			$search = ! empty( $_REQUEST['s'] )
+				? urlencode( $_REQUEST['s'] )
+				: '';
+
+			// Sanitize transient
 			$transient = sanitize_key( $_REQUEST['transient'] );
-			$site_wide = ! empty( $_REQUEST['name'] ) && ( false !== strpos( $_REQUEST['name'], '_site_transient' ) );
+
+			// Site wide
+			$site_wide = ! empty( $_REQUEST['name'] ) && $this->is_site_wide( $_REQUEST['name'] );
 		}
 
-		switch ( $action ) {
+		switch ( $this->action ) {
 
 			case 'suspend_transients' :
 				update_option( 'pw_tm_suspend', 1 );
@@ -1068,9 +1135,17 @@ class AM_Transients_Manager {
 
 		// Loop through Transients, and delete them
 		foreach ( $transients as $transient ) {
-			$site_wide = ( false !== strpos( $transient, '_site_transient' ) );
-			$prefix    = ! empty( $site_wide ) ? '_site_transient_timeout_' : '_transient_timeout_';
-			$name      = str_replace( $prefix, '', $transient );
+
+			// Site wide
+			$site_wide = $this->is_site_wide( $transient );
+
+			// Get prefix based on site-wide
+			$prefix = ! empty( $site_wide )
+				? '_site_transient_timeout_'
+				: '_transient_timeout_';
+
+			// Strip prefix from name
+			$name = str_replace( $prefix, '', $transient );
 
 			// Delete
 			$this->delete_transient( $name, $site_wide );
@@ -1189,6 +1264,7 @@ class AM_Transients_Manager {
 	/**
 	 * Delete all transients
 	 *
+	 * @since  1.0
 	 * @return false|int
 	 */
 	public function delete_all_transients() {
