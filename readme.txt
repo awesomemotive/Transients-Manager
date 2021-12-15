@@ -3,7 +3,7 @@ Contributors:      wpbeginner, smub, mordauk, johnjamesjacoby
 Author:            WPBeginner
 Author URI:        https://www.wpbeginner.com
 Plugin URI:        https://wordpress.org/plugins/transients-manager/
-License URI:       http://www.gnu.org/licenses/gpl-2.0.html
+License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 License:           GNU General Public License v2 or later
 Tags:              cron, tool, transient
 Requires PHP:      5.6.20
@@ -15,35 +15,78 @@ Provides a familiar interface to view, search, edit, and delete Transients.
 
 == Description ==
 
-This is a developer tool that provides a user interface to manage your site's transients. You can view, search, edit, and delete transients at will. A toolbar option is also provided that allows you to suspend transient updates to help with testing and debugging.
+= Easily Manage Transients =
 
-Provides following features:
+This is a developer tool that provides a user interface to manage transients.
 
-- Button to suspend transient creation / update
-- View all transients in database
-- Edit the value, name, and expiration of any transient
-- Delete any transient
-- Search transients by name
-- Button to delete all transients
-- Button to delete all expired transients
-- Button to delete all transients without an expiration
+You can easily view, search, edit, and delete transients from Tools > Transients.
 
-Have you found a bug or have a suggestion or improvement you'd like to submit? This plugin is available on [Github](https://github.com/pippinsplugins/Transients-Manager/) and pull requests are welcome!
+A toolbar toggle allows you to suspend transient updates to help with testing and debugging.
+
+= Features of Transients Manager =
+
+* Toolbar button to suspend transient writes
+* View all transients in the database
+* Edit the name, expiration, and value of any transient
+* Delete any transient
+* Search transients by name
+* Bulk actions to delete: all, expired, unexpired, or persistent transients
+
+= Credits =
+
+This plugin is owned by <a href="https://syedbalkhi.com/" rel="friend">Syed Balkhi</a> and maintained by the <a href="https://www.wpbeginner.com/" rel="friend">WPBeginner</a> team.
+
+It was originally created by <a href="https://pippinsplugins.com/" rel="friend">Pippin Williamson</a>.
+
+= What's Next =
+
+If you like this plugin and find it useful to manage transients, please leave a good rating and consider checking out our other projects:
+
+* [OptinMonster](https://optinmonster.com/) – Get more email subscribers with the most popular conversion optimization plugin for WordPress.
+* [WPForms](https://wpforms.com/) – #1 drag & drop online form builder for WordPress (trusted by 5 million sites).
+* [MonsterInsights](https://www.monsterinsights.com/) – See the stats that matter and grow your business with confidence. Best Google Analytics plugin for WordPress.
+* [SeedProd](https://www.seedprod.com/) – Create beautiful landing pages with our powerful drag & drop landing page builder.
+* [WP Mail SMTP](https://wpmailsmtp.com/) – Improve email deliverability for your contact form with the most popular SMTP plugin for WordPress.
+* [RafflePress](https://rafflepress.com/) – Best WordPress giveaway and contest plugin to grow traffic and social followers.
+* [Smash Balloon](https://smashballoon.com/) – #1 social feeds plugin for WordPress - display social media content in WordPress without code.
+* [AIOSEO](https://aioseo.com/) – The original WordPress SEO plugin to help you rank higher in search results (trusted by over 3 million sites).
+* [PushEngage](https://www.pushengage.com/) – Connect with visitors after they leave your website with the leading web push notification plugin.
+* [TrustPulse](https://trustpulse.com/) – Add real-time social proof notifications to boost your store conversions by up to 15%.
+* [SearchWP](https://searchwp.com/) – The most advanced custom WordPress search plugin to improve WordPress search quality.
+* [AffiliateWP](https://affiliatewp.com/) – #1 affiliate management plugin for WordPress. Add a referral program to your online store.
+* [WP Simple Pay](https://wpsimplepay.com/) – #1 Stripe payments plugin for WordPress. Start accepting one-time or recurring payments without a shopping cart.
+* [Easy Digital Downloads](https://easydigitaldownloads.com/) – The best WordPress eCommerce plugin to sell digital products (eBooks, software, music, and more).
+* [Sugar Calendar](https://sugarcalendar.com/) – A simple event calendar plugin for WordPress that’s both easy and powerful.
+
+Visit [WPBeginner](https://www.wpbeginner.com/) to learn from our [WordPress Tutorials](https://www.wpbeginner.com/category/wp-tutorials/) and about the [best WordPress plugins](https://www.wpbeginner.com/category/plugins/).
+
+= Thanks =
+
+Transients Manager is the best way to manage transients in your WordPress site.
+
+Our goal is to make using WordPress easy, both with our <a href="https://www.wpbeginner.com/wordpress-plugins/" rel="friend">WordPress plugins</a> and resources like <a href="https://www.wpbeginner.com/" rel="friend">WPBeginner</a>, the largest WordPress resource site for beginners.
+
+I feel that we have done that here, and I hope you find Transients Manager useful.
+
+Thank you,
+–Syed Balkhi
 
 == Screenshots ==
 
-1. Transients manager
+1. View Transients
+2. Edit Transient
 
 == Installation ==
 
-1. Activate the plugin
-2. Go to Tools > Transients
+1. Install Transients Manager by uploading the `transients-manager` directory to the `/wp-content/plugins/` directory. (See instructions on <a href="https://www.wpbeginner.com/beginners-guide/step-by-step-guide-to-install-a-wordpress-plugin-for-beginners/" rel="friend">how to install a WordPress plugin</a>.)
+2. Activate Transients Manager through the `Plugins` menu in WordPress.
+3. Go to Tools > Transients
 
 == Frequently Asked Questions ==
 
-= Does this work with sites that use object caching? =
+= Does this work with Object Caching (Memcached, Redis, etc...)? =
 
-Not at this time, it only works when transients are stored in the options table.
+No. It only works when transients are stored in the database.
 
 == Changelog ==
 
