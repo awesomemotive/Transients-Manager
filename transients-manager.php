@@ -4,7 +4,7 @@
  * Plugin URI:        https://wordpress.org/plugins/transients-manager/
  * Description:       Provides a familiar interface to view, search, edit, and delete Transients.
  * Author:            WPBeginner
- * Author URI:        http://www.wpbeginner.com
+ * Author URI:        https://www.wpbeginner.com
  * Contributors:      wpbeginner, smub, mordauk, johnjamesjacoby
  * License:           GNU General Public License v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -133,8 +133,8 @@ class AM_Transients_Manager {
 
 		// Set the screen ID
 		$this->screen_id = add_management_page(
-			__( 'Transients Manager', 'transients-manager' ),
-			__( 'Transients', 'transients-manager' ),
+			esc_html__( 'Transients Manager', 'transients-manager' ),
+			esc_html__( 'Transients', 'transients-manager' ),
 			$this->capability,
 			$this->page_id,
 			array( $this, 'admin' )
@@ -188,7 +188,7 @@ class AM_Transients_Manager {
 
 ?>
 <div class="notice notice-info">
-	<p><?php _e( 'You are using a persistent object cache. This screen may show incomplete information.', 'transients-manager' ); ?></p>
+	<p><?php esc_html_e( 'You are using a persistent object cache. This screen may show incomplete information.', 'transients-manager' ); ?></p>
 </div>
 <?php
 
@@ -199,7 +199,7 @@ class AM_Transients_Manager {
 
 ?>
 <div class="notice notice-success is-dismissible">
-	<p><strong><?php _e( 'Trasient updated.', 'transients-manager' ); ?></strong></p>
+	<p><strong><?php esc_html_e( 'Transient updated.', 'transients-manager' ); ?></strong></p>
 </div>
 <?php
 
@@ -210,7 +210,7 @@ class AM_Transients_Manager {
 
 ?>
 <div class="notice notice-success is-dismissible">
-	<p><strong><?php _e( 'Trasient deleted.', 'transients-manager' ); ?></strong></p>
+	<p><strong><?php esc_html_e( 'Transient deleted.', 'transients-manager' ); ?></strong></p>
 </div>
 <?php
 
@@ -253,14 +253,14 @@ class AM_Transients_Manager {
 ?>
 
 <div class="wrap">
-	<h1 class="wp-heading-inline"><?php _e( 'Transients', 'transients-manager' ); ?></h1>
+	<h1 class="wp-heading-inline"><?php esc_html_e( 'Transients', 'transients-manager' ); ?></h1>
 	<hr class="wp-header-end">
 
 	<form method="get">
 		<p class="search-box">
-			<label class="screen-reader-text" for="transient-search-input"><?php _e( 'Search', 'transients-manager' ); ?></label>
+			<label class="screen-reader-text" for="transient-search-input"><?php esc_html_e( 'Search', 'transients-manager' ); ?></label>
 			<input type="search" id="transient-search-input" name="s" value="<?php echo esc_attr( $search ); ?>" />
-			<input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Transients', 'transients-manager' ); ?>" />
+			<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Transients', 'transients-manager' ); ?>" />
 			<input type="hidden" name="page" value="<?php echo esc_html( $this->page_id ); ?>" />
 		</p>
 	</form>
@@ -271,25 +271,25 @@ class AM_Transients_Manager {
 
 		<div class="tablenav top">
 			<div class="alignleft actions bulkactions">
-				<label for="bulk-action-selector-top" class="screen-reader-text"><?php _e( 'Select Bulk action', 'transients-manager' ); ?></label>
+				<label for="bulk-action-selector-top" class="screen-reader-text"><?php esc_html_e( 'Select Bulk action', 'transients-manager' ); ?></label>
 				<select name="action" id="bulk-action-selector-top">
-					<option value="-1"><?php _e( 'Bulk actions', 'transients-manager' ); ?></option>
+					<option value="-1"><?php esc_html_e( 'Bulk actions', 'transients-manager' ); ?></option>
 
-					<optgroup label="<?php _e( 'Selection', 'transients-manager' ); ?>">
-						<option value="delete_selected_transients"><?php _e( 'Delete Selected', 'transients-manager' ); ?></option>
+					<optgroup label="<?php esc_attr_e( 'Selection', 'transients-manager' ); ?>">
+						<option value="delete_selected_transients"><?php esc_html_e( 'Delete Selected', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Expiration', 'transients-manager' ); ?>">
-						<option value="delete_expired_transients"><?php _e( 'Delete Expired', 'transients-manager' ); ?></option>
-						<option value="delete_transients_with_expiration"><?php _e( 'Delete With Expiration', 'transients-manager' ); ?></option>
-						<option value="delete_transients_without_expiration"><?php _e( 'Delete Without Expiration', 'transients-manager' ); ?></option>
+					<optgroup label="<?php esc_attr_e( 'Expiration', 'transients-manager' ); ?>">
+						<option value="delete_expired_transients"><?php esc_html_e( 'Delete Expired', 'transients-manager' ); ?></option>
+						<option value="delete_transients_with_expiration"><?php esc_html_e( 'Delete With Expiration', 'transients-manager' ); ?></option>
+						<option value="delete_transients_without_expiration"><?php esc_html_e( 'Delete Without Expiration', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Reset', 'transients-manager' ); ?>">
-						<option value="delete_all_transients"><?php _e( 'Delete All', 'transients-manager' ); ?></option>
+					<optgroup label="<?php esc_attr_e( 'Reset', 'transients-manager' ); ?>">
+						<option value="delete_all_transients"><?php esc_html_e( 'Delete All', 'transients-manager' ); ?></option>
 					</optgroup>
 				</select>
-				<input type="submit" class="button secondary" value="<?php _e( 'Apply', 'transients-manager' ); ?>" />
+				<input type="submit" class="button secondary" value="<?php esc_attr_e( 'Apply', 'transients-manager' ); ?>" />
 			</div>
 
 			<div class="tablenav-pages <?php echo esc_attr( $one_page ); ?>">
@@ -302,12 +302,12 @@ class AM_Transients_Manager {
 			<thead>
 				<tr>
 					<td id="cb" class="manage-column column-cb check-column">
-						<label for="cb-select-all-<?php echo (int) $page; ?>" class="screen-reader-text"><?php _e( 'Select All', 'transients-manager' ); ?></label>
+						<label for="cb-select-all-<?php echo (int) $page; ?>" class="screen-reader-text"><?php esc_html_e( 'Select All', 'transients-manager' ); ?></label>
 						<input type="checkbox" id="cb-select-all-<?php echo (int) $page; ?>">
 					</td>
-					<th class="column-primary"><?php _e( 'Name', 'transients-manager' ); ?></th>
-					<th class="column-value"><?php _e( 'Value', 'transients-manager' ); ?></th>
-					<th class="column-expiration"><?php _e( 'Expiration', 'transients-manager' ); ?></th>
+					<th class="column-primary"><?php esc_html_e( 'Name', 'transients-manager' ); ?></th>
+					<th class="column-value"><?php esc_html_e( 'Value', 'transients-manager' ); ?></th>
+					<th class="column-expiration"><?php esc_html_e( 'Expiration', 'transients-manager' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -348,33 +348,33 @@ class AM_Transients_Manager {
 
 						<tr>
 							<th id="cb" class="manage-column column-cb check-column">
-								<label for="cb-select-<?php echo (int) $page; ?>" class="screen-reader-text"><?php printf( __( 'Select %s', 'transients-manager' ), esc_html( $name ) ); ?></label>
+								<label for="cb-select-<?php echo (int) $page; ?>" class="screen-reader-text"><?php printf( esc_attr__( 'Select %s', 'transients-manager' ), esc_html( $name ) ); ?></label>
 								<input type="checkbox" id="cb-select-<?php echo (int) $transient->option_id; ?>" name="transients[]" value="<?php echo (int) $transient->option_id; ?>">
 							</th>
 
-							<td class="column-primary" data-colname="<?php _e( 'Name', 'transients-manager' ); ?>">
+							<td class="column-primary" data-colname="<?php esc_attr_e( 'Name', 'transients-manager' ); ?>">
 								<pre class="truncate">
-									<code class="transient-name" title="<?php printf( __( 'Option ID: %d', 'transients-manager' ), (int) $transient->option_id ); ?>"><?php echo esc_html( $name ); ?></code>
+									<code class="transient-name" title="<?php printf( esc_attr__( 'Option ID: %d', 'transients-manager' ), (int) $transient->option_id ); ?>"><?php echo esc_html( $name ); ?></code>
 								</pre>
 
 								<div class="row-actions">
-									<span class="edit"><a href="<?php echo esc_url( $edit_url ); ?>" class="edit"><?php _e( 'Edit', 'transients-manager' ); ?></a></span>
+									<span class="edit"><a href="<?php echo esc_url( $edit_url ); ?>" class="edit"><?php esc_html_e( 'Edit', 'transients-manager' ); ?></a></span>
 									|
-									<span class="delete"><a href="<?php echo esc_url( $delete_url ); ?>" class="delete"><?php _e( 'Delete', 'transients-manager' ); ?></a></span>
+									<span class="delete"><a href="<?php echo esc_url( $delete_url ); ?>" class="delete"><?php esc_html_e( 'Delete', 'transients-manager' ); ?></a></span>
 								</div>
 
 								<button type="button" class="toggle-row">
-									<span class="screen-reader-text"><?php _e( 'Show more details', 'transients-manager' ); ?></span>
+									<span class="screen-reader-text"><?php esc_html_e( 'Show more details', 'transients-manager' ); ?></span>
 								</button>
 							</td>
 
-							<td data-colname="<?php _e( 'Value', 'transients-manager' ); ?>">
+							<td data-colname="<?php esc_attr_e( 'Value', 'transients-manager' ); ?>">
 								<span class="transient-value truncate"><?php
 									echo $value; // HTML OK
 								?></span>
 							</td>
 
-							<td data-colname="<?php _e( 'Expiration', 'transients-manager' ); ?>">
+							<td data-colname="<?php esc_attr_e( 'Expiration', 'transients-manager' ); ?>">
 								<span class="transient-expiration"><?php
 									echo $expiration; // HTML OK
 								?></span>
@@ -385,44 +385,44 @@ class AM_Transients_Manager {
 
 				else : ?>
 
-					<tr><td colspan="4"><?php _e( 'No transients found.', 'transients-manager' ); ?></td>
+					<tr><td colspan="4"><?php esc_html_e( 'No transients found.', 'transients-manager' ); ?></td>
 
 				<?php endif; ?>
 			</tbody>
 			<tfoot>
 				<tr>
 					<td class="manage-column column-cb check-column">
-						<label for="cb-select-all-<?php echo (int) $page; ?>" class="screen-reader-text"><?php _e( 'Select All', 'transients-manager' ); ?></label>
+						<label for="cb-select-all-<?php echo (int) $page; ?>" class="screen-reader-text"><?php esc_html_e( 'Select All', 'transients-manager' ); ?></label>
 						<input type="checkbox" id="cb-select-all-<?php echo (int) $page; ?>">
 					</td>
-					<th class="column-primary"><?php _e( 'Name', 'transients-manager' ); ?></th>
-					<th><?php _e( 'Value', 'transients-manager' ); ?></th>
-					<th><?php _e( 'Expiration', 'transients-manager' ); ?></th>
+					<th class="column-primary"><?php esc_html_e( 'Name', 'transients-manager' ); ?></th>
+					<th><?php esc_html_e( 'Value', 'transients-manager' ); ?></th>
+					<th><?php esc_html_e( 'Expiration', 'transients-manager' ); ?></th>
 				</tr>
 			</tfoot>
 		</table>
 
 		<div class="tablenav bottom">
 			<div class="alignleft actions bulkactions">
-				<label for="bulk-action-selector-top" class="screen-reader-text"><?php _e( 'Select Bulk action', 'transients-manager' ); ?></label>
+				<label for="bulk-action-selector-top" class="screen-reader-text"><?php esc_html_e( 'Select Bulk action', 'transients-manager' ); ?></label>
 				<select name="action" id="bulk-action-selector-bottom">
-					<option value="-1"><?php _e( 'Bulk actions', 'transients-manager' ); ?></option>
+					<option value="-1"><?php esc_html_e( 'Bulk actions', 'transients-manager' ); ?></option>
 
-					<optgroup label="<?php _e( 'Selection', 'transients-manager' ); ?>">
-						<option value="delete_selected_transients"><?php _e( 'Delete Selected', 'transients-manager' ); ?></option>
+					<optgroup label="<?php esc_attr_e( 'Selection', 'transients-manager' ); ?>">
+						<option value="delete_selected_transients"><?php esc_html_e( 'Delete Selected', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Expiration', 'transients-manager' ); ?>">
-						<option value="delete_expired_transients"><?php _e( 'Delete Expired', 'transients-manager' ); ?></option>
-						<option value="delete_transients_with_expiration"><?php _e( 'Delete With Expiration', 'transients-manager' ); ?></option>
-						<option value="delete_transients_without_expiration"><?php _e( 'Delete Without Expiration', 'transients-manager' ); ?></option>
+					<optgroup label="<?php esc_attr_e( 'Expiration', 'transients-manager' ); ?>">
+						<option value="delete_expired_transients"><?php esc_html_e( 'Delete Expired', 'transients-manager' ); ?></option>
+						<option value="delete_transients_with_expiration"><?php esc_html_e( 'Delete With Expiration', 'transients-manager' ); ?></option>
+						<option value="delete_transients_without_expiration"><?php esc_html_e( 'Delete Without Expiration', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Reset', 'transients-manager' ); ?>">
-						<option value="delete_all_transients"><?php _e( 'Delete All', 'transients-manager' ); ?></option>
+					<optgroup label="<?php esc_attr_e( 'Reset', 'transients-manager' ); ?>">
+						<option value="delete_all_transients"><?php esc_html_e( 'Delete All', 'transients-manager' ); ?></option>
 					</optgroup>
 				</select>
-				<input type="submit" class="button secondary" value="<?php _e( 'Apply', 'transients-manager' ); ?>" />
+				<input type="submit" class="button secondary" value="<?php esc_attr_e( 'Apply', 'transients-manager' ); ?>" />
 			</div>
 
 			<div class="tablenav-pages <?php echo esc_attr( $one_page ); ?>">
@@ -452,7 +452,7 @@ class AM_Transients_Manager {
 ?>
 
 <div class="wrap">
-	<h1 class="wp-heading-inline"><?php _e( 'Edit Transient', 'transients-manager' ); ?></h1>
+	<h1 class="wp-heading-inline"><?php esc_html_e( 'Edit Transient', 'transients-manager' ); ?></h1>
 	<hr class="wp-header-end">
 
 	<form method="post">
@@ -463,19 +463,19 @@ class AM_Transients_Manager {
 		<table class="form-table">
 			<tbody>
 				<tr>
-					<th><?php _e( 'Option ID', 'transients-manager' ); ?></th>
+					<th><?php esc_html_e( 'Option ID', 'transients-manager' ); ?></th>
 					<td><input type="text" disabled class="large-text code" name="name" value="<?php echo esc_attr( $transient->option_id ); ?>" /></td>
 				</tr>
 				<tr>
-					<th><?php _e( 'Name', 'transients-manager' ); ?></th>
+					<th><?php esc_html_e( 'Name', 'transients-manager' ); ?></th>
 					<td><input type="text" class="large-text code" name="name" value="<?php echo esc_attr( $transient->option_name ); ?>" /></td>
 				</tr>
 				<tr>
-					<th><?php _e( 'Expiration', 'transients-manager' ); ?></th>
+					<th><?php esc_html_e( 'Expiration', 'transients-manager' ); ?></th>
 					<td><input type="text" class="large-text" name="expires" value="<?php echo esc_attr( $expiration ); ?>" />
 				</tr>
 				<tr>
-					<th><?php _e( 'Value', 'transients-manager' ); ?></th>
+					<th><?php esc_html_e( 'Value', 'transients-manager' ); ?></th>
 					<td>
 						<textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px;"><?php
 							echo esc_textarea( $transient->option_value );
@@ -586,12 +586,12 @@ class AM_Transients_Manager {
 		// Suspended
 		if ( get_option( 'pw_tm_suspend' ) ) {
 			$action = 'unsuspend_transients';
-			$label  = '<span style="color: #b32d2e;">' . __( 'Unsuspend Transients', 'transients-manager' ) . '</span>';
+			$label  = '<span style="color: #b32d2e;">' . esc_html__( 'Unsuspend Transients', 'transients-manager' ) . '</span>';
 
 		// Not suspended
 		} else {
 			$action = 'suspend_transients';
-			$label  = __( 'Suspend Transients', 'transients-manager' );
+			$label  = esc_html__( 'Suspend Transients', 'transients-manager' );
 		}
 
 		// Suspend
@@ -612,7 +612,7 @@ class AM_Transients_Manager {
 		// View
 		$wp_admin_bar->add_node( array(
 			'id'     => 'tm-view',
-			'title'  => __( 'View Transients', 'transients-manager' ),
+			'title'  => esc_html__( 'View Transients', 'transients-manager' ),
 			'parent' => 'tm-suspend',
 			'href'   => add_query_arg(
 				array(
@@ -816,30 +816,30 @@ class AM_Transients_Manager {
 	private function get_transient_value_type( $transient ) {
 
 		// Default type
-		$type = __( 'unknown', 'transients-manager' );
+		$type = esc_html__( 'unknown', 'transients-manager' );
 
 		// Try to unserialize
 		$value = maybe_unserialize( $transient->option_value );
 
 		// Array
 		if ( is_array( $value ) ) {
-			$type = __( 'array', 'transients-manager' );
+			$type = esc_html__( 'array', 'transients-manager' );
 
 		// JSON
 		} elseif ( is_object( json_decode( $value ) ) ) {
-			$type = __( 'json', 'transients-manager' );
+			$type = esc_html__( 'json', 'transients-manager' );
 
 		// Object
 		} elseif ( is_object( $value ) ) {
-			$type = __( 'object', 'transients-manager' );
+			$type = esc_html__( 'object', 'transients-manager' );
 
 		// Serialized array
 		} elseif ( is_serialized( $value ) ) {
-			$type = __( 'serialized', 'transients-manager' );
+			$type = esc_html__( 'serialized', 'transients-manager' );
 
 		// HTML
 		} elseif ( strip_tags( $value ) !== $value ) {
-			$type = __( 'html', 'transients-manager' );
+			$type = esc_html__( 'html', 'transients-manager' );
 
 		// Scalar
 		} elseif ( is_scalar( $value ) ) {
@@ -848,24 +848,24 @@ class AM_Transients_Manager {
 
 				// Likely a timestamp
 				if ( 10 === strlen( $value ) ) {
-					$type = __( 'timestamp?', 'transients-manager' );
+					$type = esc_html__( 'timestamp?', 'transients-manager' );
 
 				// Likely a boolean
 				} elseif ( in_array( $value, array( '0', '1' ), true ) ) {
-					$type = __( 'boolean?', 'transients-manager' );
+					$type = esc_html__( 'boolean?', 'transients-manager' );
 
 				// Any number
 				} else {
-					$type = __( 'numeric', 'transients-manager' );
+					$type = esc_html__( 'numeric', 'transients-manager' );
 				}
 
 			} else {
-				$type = __( 'scalar', 'transients-manager' );
+				$type = esc_html__( 'scalar', 'transients-manager' );
 			}
 
 		// Empty
 		} elseif ( empty( $value ) ) {
-			$type = __( 'empty', 'transients-manager' );
+			$type = esc_html__( 'empty', 'transients-manager' );
 		}
 
 		// Return type
@@ -906,7 +906,7 @@ class AM_Transients_Manager {
 
 		// Bail if no expiration
 		if ( empty( $expiration ) ) {
-			return '&mdash;<br><span class="badge">' . __( 'Persistent', 'transients-manager' ) . '</span>';
+			return '&mdash;<br><span class="badge">' . esc_html__( 'Persistent', 'transients-manager' ) . '</span>';
 		}
 
 		// UTC & local dates
@@ -922,7 +922,7 @@ class AM_Transients_Manager {
 
 		// Expired
 		if ( $this->time_now > $expiration ) {
-			return $time . '<br><span class="transient-expired badge">' . __( 'Expired', 'transients-manager' ) . '</span>';
+			return $time . '<br><span class="transient-expired badge">' . esc_html__( 'Expired', 'transients-manager' ) . '</span>';
 		}
 
 		// Return time since
@@ -1393,7 +1393,7 @@ class AM_Transients_Manager {
 		);
 
 		if ( $since <= 0 ) {
-			return __( 'now', 'transients-manager' );
+			return esc_html__( 'now', 'transients-manager' );
 		}
 
 		/**
