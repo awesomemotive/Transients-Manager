@@ -90,7 +90,7 @@ No. It only works when transients are stored in the database.
 
 == Changelog ==
 
-= 2.0.0 - December 15, 2021 =
+= 2.0.0 - December 16, 2021 =
 
 * Added: Small-screen support
 * Added: Value type hints
