@@ -542,8 +542,8 @@ class AM_Transients_Manager {
 		$cron_time_utc = gmdate( 'Y-m-d\TH:i:s+00:00', $this->next_cron_delete );
 		$ct_time_since = $this->time_since( $this->next_cron_delete - $this->time_now );
 		$nc_time       = esc_html( sprintf(
-			/* translators: 1: Date and time, 2: Time since */
-			__( 'Auto clean: %1$s (%2$s) - %3$s from now', 'transients-manager' ),
+			/* translators: 1: Date and time, 2: Timezone, 3: Time since */
+			__( 'Expired transients scheduled for deletion on: %1$s (%2$s) – %3$s from now', 'transients-manager' ),
 			$cron_time,
 			$timezone_name,
 			$ct_time_since
@@ -558,7 +558,7 @@ class AM_Transients_Manager {
 		$st_html
 	);
 
-	?><br><?php
+	?><br><br><?php
 
 	echo sprintf( '<time datetime="%1$s" title="%1$s">%2$s</time>',
 		$cron_time_utc,
