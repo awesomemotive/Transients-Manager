@@ -275,17 +275,17 @@ class AM_Transients_Manager {
 				<select name="action" id="bulk-action-selector-top">
 					<option value="-1"><?php _e( 'Bulk actions', 'transients-manager' ); ?></option>
 
-					<optgroup label="<?php _e( 'Selected', 'transients-manager' ); ?>">
+					<optgroup label="<?php _e( 'Selection', 'transients-manager' ); ?>">
 						<option value="delete_selected_transients"><?php _e( 'Delete Selected', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Expirations', 'transients-manager' ); ?>">
+					<optgroup label="<?php _e( 'Expiration', 'transients-manager' ); ?>">
 						<option value="delete_expired_transients"><?php _e( 'Delete Expired', 'transients-manager' ); ?></option>
 						<option value="delete_transients_with_expiration"><?php _e( 'Delete With Expiration', 'transients-manager' ); ?></option>
 						<option value="delete_transients_without_expiration"><?php _e( 'Delete Without Expiration', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Flush', 'transients-manager' ); ?>">
+					<optgroup label="<?php _e( 'Reset', 'transients-manager' ); ?>">
 						<option value="delete_all_transients"><?php _e( 'Delete All', 'transients-manager' ); ?></option>
 					</optgroup>
 				</select>
@@ -408,17 +408,17 @@ class AM_Transients_Manager {
 				<select name="action" id="bulk-action-selector-bottom">
 					<option value="-1"><?php _e( 'Bulk actions', 'transients-manager' ); ?></option>
 
-					<optgroup label="<?php _e( 'Selected', 'transients-manager' ); ?>">
+					<optgroup label="<?php _e( 'Selection', 'transients-manager' ); ?>">
 						<option value="delete_selected_transients"><?php _e( 'Delete Selected', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Expirations', 'transients-manager' ); ?>">
+					<optgroup label="<?php _e( 'Expiration', 'transients-manager' ); ?>">
 						<option value="delete_expired_transients"><?php _e( 'Delete Expired', 'transients-manager' ); ?></option>
 						<option value="delete_transients_with_expiration"><?php _e( 'Delete With Expiration', 'transients-manager' ); ?></option>
 						<option value="delete_transients_without_expiration"><?php _e( 'Delete Without Expiration', 'transients-manager' ); ?></option>
 					</optgroup>
 
-					<optgroup label="<?php _e( 'Flush', 'transients-manager' ); ?>">
+					<optgroup label="<?php _e( 'Reset', 'transients-manager' ); ?>">
 						<option value="delete_all_transients"><?php _e( 'Delete All', 'transients-manager' ); ?></option>
 					</optgroup>
 				</select>
@@ -446,7 +446,9 @@ class AM_Transients_Manager {
 	 */
 	protected function page_edit_transient( $transient = false) {
 
-		$name = $this->get_transient_name( $transient );
+		// Get values
+		$name       = $this->get_transient_name( $transient );
+		$expiration = $this->get_transient_expiration_time( $transient );
 ?>
 
 <div class="wrap">
@@ -470,7 +472,7 @@ class AM_Transients_Manager {
 				</tr>
 				<tr>
 					<th><?php _e( 'Expiration', 'transients-manager' ); ?></th>
-					<td><input type="text" class="large-text" name="expires" value="<?php echo $this->get_transient_expiration_time( $transient ); ?>" />
+					<td><input type="text" class="large-text" name="expires" value="<?php echo esc_attr( $expiration ); ?>" />
 				</tr>
 				<tr>
 					<th><?php _e( 'Value', 'transients-manager' ); ?></th>
@@ -879,15 +881,15 @@ class AM_Transients_Manager {
 	 */
 	private function get_transient_expiration_time( $transient ) {
 
+		// Get the same to use in the option key
 		$name = $this->get_transient_name( $transient );
 
-		if ( $this->is_site_wide( $transient->option_name ) ) {
-			$time = get_option( "_site_transient_timeout_{$name}" );
+		// Get the value of the timeout
+		$time = $this->is_site_wide( $transient->option_name )
+			? get_option( "_site_transient_timeout_{$name}" )
+			: get_option( "_transient_timeout_{$name}" );
 
-		} else {
-			$time = get_option( "_transient_timeout_{$name}" );
-		}
-
+		// Return the value
 		return $time;
 	}
 
