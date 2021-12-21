@@ -825,10 +825,6 @@ class AM_Transients_Manager {
 		if ( is_array( $value ) ) {
 			$type = esc_html__( 'array', 'transients-manager' );
 
-		// JSON
-		} elseif ( is_object( json_decode( $value ) ) ) {
-			$type = esc_html__( 'json', 'transients-manager' );
-
 		// Object
 		} elseif ( is_object( $value ) ) {
 			$type = esc_html__( 'object', 'transients-manager' );
@@ -859,6 +855,11 @@ class AM_Transients_Manager {
 					$type = esc_html__( 'numeric', 'transients-manager' );
 				}
 
+			// JSON
+			} elseif ( is_string( $value ) && is_object( json_decode( $value ) ) ) {
+				$type = esc_html__( 'json', 'transients-manager' );
+
+			// Scalar
 			} else {
 				$type = esc_html__( 'scalar', 'transients-manager' );
 			}
