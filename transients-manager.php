@@ -1279,10 +1279,9 @@ class AM_Transients_Manager {
 		// Query
 		$count = $wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$wpdb->options}
-				WHERE option_name LIKE %s"
-			),
-			$esc_name
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$esc_name
+			)
 		);
 
 		// Return count
