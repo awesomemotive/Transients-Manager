@@ -92,8 +92,9 @@ No. It only works when transients are stored in the database.
 
 = 2.0.2 - December 23, 2021 =
 
-* Fix: "Delete All" bulk action works again
-* Fix: Add "Delete All" button to table actions
+* Fixed: "Delete All" bulk action works again
+* Fixed: Add "Delete All" button to table actions
+* Improved: More value types now visible in List Table (up to 100 characters)
 
 = 2.0.1 - December 21, 2021 =
 
