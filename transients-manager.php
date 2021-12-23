@@ -11,7 +11,7 @@
  * Text Domain:       transients-manager
  * Requires PHP:      5.6.20
  * Requires at least: 5.3
- * Version:           2.0.1
+ * Version:           2.0.2
  */
 
 // Exit if accessed directly
@@ -265,7 +265,7 @@ class AM_Transients_Manager {
 		</p>
 	</form>
 
-	<form method="post">
+	<form method="post" id="transients-delete">
 		<input type="hidden" name="transient" value="all" />
 		<?php wp_nonce_field( 'transients_manager' ); ?>
 
@@ -290,6 +290,10 @@ class AM_Transients_Manager {
 					</optgroup>
 				</select>
 				<input type="submit" class="button secondary" value="<?php esc_attr_e( 'Apply', 'transients-manager' ); ?>" />
+			</div>
+
+			<div class="alignleft actions">
+				<input type="button" class="button secondary" value="<?php esc_attr_e( 'Delete All', 'transients-manager' ); ?>" onclick="const select = document.getElementById('bulk-action-selector-top'); select.value='delete_all_transients'; select.dispatchEvent(new Event('change')); document.getElementById('transients-delete').submit();" />
 			</div>
 
 			<div class="tablenav-pages <?php echo esc_attr( $one_page ); ?>">
@@ -794,13 +798,11 @@ class AM_Transients_Manager {
 		// Get the value type
 		$type = $this->get_transient_value_type( $transient );
 
-		// Maybe unserialize
-		$value = maybe_unserialize( $transient->option_value );
+		// Trim value to 100 chars
+		$value = substr( $transient->option_value, 0, 100 );
 
-		// Trim or dash
-		$value = is_scalar( $value )
-			? '<code>' . wp_trim_words( $value, 5 ) . '</code>'
-			: '&mdash;';
+		// Escape & wrap in <code> tag
+		$value = '<code>' . esc_html( $value ) . '</code>';
 
 		// Return
 		return $value . '<br><span class="transient-type badge">' . esc_html( $type ) . '</span>';
@@ -1279,10 +1281,9 @@ class AM_Transients_Manager {
 		// Query
 		$count = $wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$wpdb->options}
-				WHERE option_name LIKE %s"
-			),
-			$esc_name
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$esc_name
+			)
 		);
 
 		// Return count
