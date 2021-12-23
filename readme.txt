@@ -9,7 +9,7 @@ Tags:              cron, tool, transient
 Requires PHP:      5.6.20
 Requires at least: 5.3
 Tested up to:      5.9
-Stable Tag:        2.0.1
+Stable Tag:        2.0.2
 
 Provides a familiar interface to view, search, edit, and delete Transients.
 
@@ -89,6 +89,11 @@ Thank you,
 No. It only works when transients are stored in the database.
 
 == Changelog ==
+
+= 2.0.2 - December 23, 2021 =
+
+* Fix: "Delete All" bulk action works again
+* Fix: Add "Delete All" button to table actions
 
 = 2.0.1 - December 21, 2021 =
 
