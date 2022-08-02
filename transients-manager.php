@@ -11,7 +11,7 @@
  * Text Domain:       transients-manager
  * Requires PHP:      5.6.20
  * Requires at least: 5.3
- * Version:           2.0.2
+ * Version:           2.0.3
  */
 
 // Exit if accessed directly
