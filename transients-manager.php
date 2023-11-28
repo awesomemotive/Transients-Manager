@@ -52,6 +52,30 @@ class AM_Transients_Manager {
 	public $next_cron_delete = 0;
 
 	/**
+         * ID of the transient
+	 * 
+  	 * @since 2.0.4
+    	 * @var int
+	 */
+	public $transient_id;
+
+	/**
+         * Transient object
+	 * 
+  	 * @since 2.0.4
+    	 * @var object
+	 */
+	public $transient;
+
+	/**
+         * Action name
+	 * 
+  	 * @since 2.0.4
+    	 * @var string
+	 */
+	public $action;
+
+	/**
 	 * Get things started
 	 *
 	 * @since 1.0
