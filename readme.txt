@@ -9,7 +9,7 @@ Tags:              cron, tool, transient
 Requires PHP:      5.6.20
 Requires at least: 5.3
 Tested up to:      6.5
-Stable Tag:        2.0.4
+Stable Tag:        2.0.5
 
 Provides a familiar interface to view, search, edit, and delete Transients.
 
@@ -90,7 +90,7 @@ No. It only works when transients are stored in the database.
 
 == Changelog ==
 
-= 2.0.4 - December 12, 2023 =
+= 2.0.5 - December 12, 2023 =
 * Improved: Support for PHP8.2 and below
 
 = 2.0.3 - August 2, 2022 =

@@ -11,7 +11,7 @@
  * Text Domain:       transients-manager
  * Requires PHP:      5.6.20
  * Requires at least: 5.3
- * Version:           2.0.4
+ * Version:           2.0.5
  */
 
 // Exit if accessed directly
@@ -26,6 +26,14 @@ class AM_Transients_Manager {
 	 * @var   string
 	 */
 	public $page_id = 'transients-manager';
+
+	/**
+	 * ID of the Admin Screen
+	 *
+  	 * @since 2.0.5
+	 * @var   string
+	 */
+	public $screen_id = '';
 
 	/**
 	 * Capability the current-user needs to manage transients
