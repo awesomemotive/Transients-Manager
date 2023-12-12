@@ -11,7 +11,7 @@
  * Text Domain:       transients-manager
  * Requires PHP:      5.6.20
  * Requires at least: 5.3
- * Version:           2.0.3
+ * Version:           2.0.4
  */
 
 // Exit if accessed directly
@@ -44,7 +44,7 @@ class AM_Transients_Manager {
 	public $time_now = 0;
 
 	/**
-	 * Timestamp of the next time WPCron will delete expired transients
+	 * The next timestamp to delete expired transients (via WP Cron)
 	 *
 	 * @since 2.0
 	 * @var   int
@@ -52,28 +52,28 @@ class AM_Transients_Manager {
 	public $next_cron_delete = 0;
 
 	/**
-         * ID of the transient
-	 * 
+	 * Transient ID
+	 *
   	 * @since 2.0.4
-    	 * @var int
+	 * @var   int
 	 */
-	public $transient_id;
+	public $transient_id = 0;
 
 	/**
-         * Transient object
-	 * 
+	 * Transient object
+	 *
   	 * @since 2.0.4
-    	 * @var object
+	 * @var   object
 	 */
-	public $transient;
+	public $transient = false;
 
 	/**
-         * Action name
-	 * 
+	 * Action name
+	 *
   	 * @since 2.0.4
-    	 * @var string
+	 * @var   string
 	 */
-	public $action;
+	public $action = '';
 
 	/**
 	 * Get things started
