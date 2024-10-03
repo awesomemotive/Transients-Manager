@@ -18,7 +18,7 @@ class CrossPromotion
     public static function init()
     {
         add_action('admin_notices', [__CLASS__, 'notices']);
-        add_action('wp_enqueue_scripts', [__CLASS__, 'enqueueScripts']);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueScripts']);
         add_action('wp_ajax_transients_manager_extra_plugin', [__CLASS__, 'installPluginAjax']);
     }
 
@@ -33,23 +33,19 @@ class CrossPromotion
             return;
         }
 
-        // Don't load in case Lite is installed. Pro only has a link to the website.
-        if (self::isPluginInstalled('duplicator/duplicator.php')) {
-            return;
-        }
-
         wp_enqueue_script(
             'am-tm-extra-plugins',
             AM_TM_PLUGIN_URL . "assets/js/extra-plugins.js",
-            array('jquery'),
+            ['jquery'],
             AM_TM_VERSION,
             true
         );
+
         wp_localize_script(
             'am-tm-extra-plugins',
             'l10nAmTmExtraPlugins',
             array(
-                'loading'   => esc_html__('Loading...', 'transients-manager'),
+                'loading'   => esc_html__('Installing...', 'transients-manager'),
                 'failure'   => esc_html__('Failure', 'transients-manager'),
                 'active'    => esc_html__('Active', 'transients-manager'),
                 'activated' => esc_html__('Activated', 'transients-manager'),
@@ -59,10 +55,10 @@ class CrossPromotion
         wp_localize_script(
             'am-tm-extra-plugins',
             'am_tm_extra_plugins',
-            array(
+            [
                 'ajax_url'                   => admin_url('admin-ajax.php'),
                 'extra_plugin_install_nonce' => wp_create_nonce('transients_manager_extra_plugin'),
-            )
+            ]
         );
     }
 
@@ -73,10 +69,6 @@ class CrossPromotion
      */
     public static function installPluginAjax()
     {
-        if (!self::shouldShowNotice()) {
-            return;
-        }
-
         try {
             if (check_ajax_referer('transients_manager_extra_plugin', 'nonce', false) === false) {
                 throw new \Exception(__('Invalid nonce', 'transients-manager'));
@@ -86,12 +78,12 @@ class CrossPromotion
                 throw new \Exception(__('You do not have permission to install plugins', 'transients-manager'));
             }
 
-            $slug = filter_input(INPUT_POST, 'plugin', FILTER_SANITIZE_STRING);
+            $slug = filter_input(INPUT_POST, 'plugin', FILTER_SANITIZE_SPECIAL_CHARS);
             if (empty($slug)) {
                 throw new \Exception(__('Invalid plugin slug', 'transients-manager'));
             }
 
-            if (self::installPlugin($slug)) {
+            if (self::installPlugin($slug) && self::activatePlugin($slug)) {
                 wp_send_json_success([
                     'success' => true,
                     'message' => __('Plugin installed successfully', 'transients-manager'),
@@ -138,6 +130,7 @@ class CrossPromotion
         if (!current_user_can('install_plugins')) {
             return false;
         }
+
         if ($tm->getInstallTime() + 2 * WEEK_IN_SECONDS < time()) {
             return false;
         }
@@ -215,7 +208,7 @@ class CrossPromotion
                 flex-direction: column;
                 align-items: center;
                 border-left-width: 1px;
-                padding: 20px;
+                padding: 20px 20px 30px 20px;
             }
 
             .cross-promotion .intro-text {
@@ -248,6 +241,15 @@ class CrossPromotion
             .cross-promotion-plugin button.button,
             .cross-promotion-plugin a.button {
                 padding: 0px 30px;
+            }
+            
+            .cross-promotion-plugin button.button {
+                display: flex;
+                align-items: center;
+            }
+
+            .cross-promotion-plugin button.button span.dashicons-yes {
+                color: #46b450;
             }
         </style>
 <?php
@@ -306,6 +308,26 @@ class CrossPromotion
         $upgrader = new \Plugin_Upgrader(new \Automatic_Upgrader_Skin());
         if (!$upgrader->install($pluginInfo['url'])) {
             throw new \Exception('Failed to install plugin');
+        }
+
+        return true;
+    }
+
+    /**
+     * Activate plugin by slug
+     *
+     * @param string $slug Plugin slug
+     *
+     * @return bool true on success
+     */
+    protected static function activatePlugin($slug)
+    {
+        if (self::isPluginInstalled($slug) && is_plugin_active($slug)) {
+            return true;
+        }
+
+        if (!is_null(activate_plugin($slug))) {
+            throw new \Exception('Failed to activate plugin');
         }
 
         return true;

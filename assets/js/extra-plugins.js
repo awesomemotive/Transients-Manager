@@ -67,11 +67,9 @@ var AmTmExtraPlugins = window.AmTmExtraPlugins || (function (document, window, $
                         }
 
                         button.fadeOut(500);
-                        status.fadeOut(500);
-
                         button.html(l10nAmTmExtraPlugins.activated);
+                        button.prepend('<span class="dashicons dashicons-yes"></span>');
                         button.fadeIn(300);
-                        status.fadeIn(300);
                     });
                 }
             );
