@@ -42,6 +42,7 @@ It was originally created by <a href="https://pippinsplugins.com/" rel="friend">
 
 If you like this plugin and find it useful to manage transients, please leave a good rating and consider checking out our other projects:
 
+* [Duplicator](https://duplicator.com/) – Easy, fast and secure WordPress backups and website migration.
 * [OptinMonster](https://optinmonster.com/) – Get more email subscribers with the most popular conversion optimization plugin for WordPress.
 * [WPForms](https://wpforms.com/) – #1 drag & drop online form builder for WordPress (trusted by 5 million sites).
 * [MonsterInsights](https://www.monsterinsights.com/) – See the stats that matter and grow your business with confidence. Best Google Analytics plugin for WordPress.
@@ -89,6 +90,9 @@ Thank you,
 No. It only works when transients are stored in the database.
 
 == Changelog ==
+
+= 2.0.6 - October 3, 2024 =
+* Improved: Product Education
 
 = 2.0.5 - December 12, 2023 =
 * Improved: Support for PHP8.2 and below
