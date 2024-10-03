@@ -192,9 +192,7 @@ class CrossPromotion
                 continue;
             }
 
-            $isPro = false;
             if ($hasPro && self::isPluginInstalled($slug)) {
-                $isPro      = true;
                 $pluginInfo = self::getPluginBySlug($pluginInfo['pro']);
             }
 ?>
@@ -209,7 +207,7 @@ class CrossPromotion
         <div class="cross-promotion-info">
             <p class="name"><strong><?php echo esc_html($pluginInfo['name']); ?></strong></p>
             <p class="desc"><?php echo esc_html($pluginInfo['desc']); ?></p>
-            <?php if (!$isPro) : ?>
+            <?php if (!$pluginInfo['isPro']) : ?>
                 <button class="am-tm-extra-plugin-item button button-primary" data-plugin="<?php echo esc_attr($slug); ?>">
                     <?php esc_html_e('Install', 'transients-manager'); ?>
                 </button>
