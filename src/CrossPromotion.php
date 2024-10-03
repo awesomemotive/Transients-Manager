@@ -20,6 +20,7 @@ class CrossPromotion
         add_action('admin_notices', [__CLASS__, 'notices']);
         add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueScripts']);
         add_action('wp_ajax_transients_manager_extra_plugin', [__CLASS__, 'installPluginAjax']);
+        add_action('wp_ajax_transients_manager_cross_promo_dismiss', [__CLASS__, 'dismissNotice']);
     }
 
     /**
@@ -58,8 +59,36 @@ class CrossPromotion
             [
                 'ajax_url'                   => admin_url('admin-ajax.php'),
                 'extra_plugin_install_nonce' => wp_create_nonce('transients_manager_extra_plugin'),
+                'cross_promo_dismiss_nonce'  => wp_create_nonce('transients_manager_cross_promo_dismiss'),
             ]
         );
+    }
+
+    /**
+     * Dismiss notice
+     *
+     * @return void
+     */
+    public static function dismissNotice()
+    {
+        if (check_ajax_referer('transients_manager_cross_promo_dismiss', 'nonce', false) === false) {
+            wp_send_json_error([
+                'success' => false,
+                'message' => __('Invalid nonce', 'transients-manager'),
+            ]);
+        }
+
+        if (update_option(self::NOTICE_DISMISS_KEY, true) === false) {
+            wp_send_json_error([
+                'success' => false,
+                'message' => __('Failed to dismiss notice', 'transients-manager'),
+            ]);
+        }
+
+        wp_send_json_success([
+            'success' => true,
+            'message' => __('Notice dismissed', 'transients-manager'),
+        ]);
     }
 
     /**
@@ -131,7 +160,7 @@ class CrossPromotion
             return false;
         }
 
-        if ($tm->getInstallTime() + 2 * WEEK_IN_SECONDS < time()) {
+        if ($tm->getInstallTime() + 2 * WEEK_IN_SECONDS > time()) {
             return false;
         }
 

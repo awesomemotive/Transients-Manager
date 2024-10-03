@@ -101,10 +101,10 @@ class TransientsManager {
      */
     public function getInstallTime()
     {
-        $installTime = get_option('pw_tm_install_time', false);
+        $installTime = get_option('am_tm_install_time', false);
         if (!$installTime) {
             $installTime = time();
-            update_option('pw_tm_install_time', $installTime);
+            update_option('am_tm_install_time', $installTime);
         }
         return $installTime;
     }

@@ -73,6 +73,27 @@ var AmTmExtraPlugins = window.AmTmExtraPlugins || (function (document, window, $
                     });
                 }
             );
+
+            $(document).on(
+                'click',
+                '.notice.cross-promotion .notice-dismiss',
+                function (e) {
+                    e.preventDefault();
+
+                    $.post(
+                        am_tm_extra_plugins.ajax_url,
+                        {
+                            action: 'transients_manager_cross_promo_dismiss',
+                            nonce: am_tm_extra_plugins.cross_promo_dismiss_nonce,
+                        }
+                    ).done(function (response) {
+                        if (response.success !== true) {
+                            console.log("Error dismissing notice");
+                            return;
+                        }
+                    });
+                }
+            );
         },
 
 
