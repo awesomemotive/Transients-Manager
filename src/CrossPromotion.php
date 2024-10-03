@@ -4,6 +4,8 @@ namespace AM\TransientsManager;
 
 /**
  * Cross promotion class
+ *
+ * @since 2.0.6 Introduced class
  */
 class CrossPromotion
 {
@@ -202,7 +204,7 @@ class CrossPromotion
     </p>
     <div class="cross-promotion-plugin">
         <div class="cross-promotion-image">
-            <img src="<?php echo esc_url(AM_TM_PLUGIN_URL . '/assets/img/duplicator-icon.svg'); ?>" alt="<?php esc_attr($pluginInfo['name']); ?>">
+            <img src="<?php echo esc_url($pluginInfo['iconUrl']); ?>" alt="<?php esc_attr($pluginInfo['name']); ?>">
         </div>
         <div class="cross-promotion-info">
             <p class="name"><strong><?php echo esc_html($pluginInfo['name']); ?></strong></p>
@@ -212,7 +214,9 @@ class CrossPromotion
                     <?php esc_html_e('Install', 'transients-manager'); ?>
                 </button>
             <?php else : ?>
-                <a href="<?php echo esc_url($pluginInfo['url']); ?>" class="button button-primary" target="_blank"><?php esc_html_e('Install', 'transients-manager'); ?></a>
+                <a href="<?php echo esc_url($pluginInfo['url']); ?>" class="button button-primary" target="_blank">
+                    <?php esc_html_e('Install', 'transients-manager'); ?>
+                </a>
             <?php endif; ?>
         </div>
     </div>
@@ -361,26 +365,36 @@ class CrossPromotion
     }
 
     /**
-     * Get the plugin info
+     * Get all plugin infos
      *
-     * @return array<string, array{name:string,url:string,desc:string,pro:string|bool,isPro:bool}> Plugin info or false if not found
+     * @return array<string, array{name:string,url:string,desc:string,iconUrl:string,pro:mixed,isPro:bool}> All plugins
      */
     protected static function getAllPlugins()
     {
         return [
             'duplicator/duplicator.php' => [
-                'name' => __('Duplicator - WordPress Migration & Backup Plugin', 'transients-manager'),
-                'url'  => 'https://downloads.wordpress.org/plugin/duplicator.zip',
-                'desc' => __('Leading WordPress backup & site migration plugin. Over 1,500,000+ smart website owners use Duplicator to make easy, reliable and secure WordPress backups to protect their websites.', 'transients-manager'),
-                'pro'  => 'duplicator-pro/duplicator-pro.php' ,
-                'isPro' => false,
+                'name'    => __('Duplicator - WordPress Migration & Backup Plugin', 'transients-manager'),
+                'url'     => 'https://downloads.wordpress.org/plugin/duplicator.zip',
+                'desc'    => __(
+                    'Leading WordPress backup & site migration plugin. Over 1,500,000+ smart website owners use Duplicator to make easy,
+                     reliable and secure WordPress backups to protect their websites.',
+                    'transients-manager'
+                ),
+                'iconUrl' => AM_TM_PLUGIN_URL . '/assets/img/duplicator-icon.svg',
+                'pro'     => 'duplicator-pro/duplicator-pro.php' ,
+                'isPro'   => false,
             ],
             'duplicator-pro/duplicator-pro.php' => [
-                'name'  => __('Duplicator Pro - WordPress Migration & Backup Plugin', 'transients-manager'),
-                'url'   => 'http://duplicator.com/?utm_source=transientsmanager&utm_medium=link&utm_campaign=Cross%20Promotion',
-                'desc'  => __('Leading WordPress backup & site migration plugin. Smart website owners use Duplicator Pro to make easy, reliable and secure WordPress backups to protect their websites.', 'transients-manager'),
-                'pro'  => false,
-                'isPro' => true,
+                'name'    => __('Duplicator Pro - WordPress Migration & Backup Plugin', 'transients-manager'),
+                'url'     => 'http://duplicator.com/?utm_source=transientsmanager&utm_medium=link&utm_campaign=Cross%20Promotion',
+                'desc'    => __(
+                    'Leading WordPress backup & site migration plugin. Smart website owners use Duplicator Pro to make easy,
+                     reliable and secure WordPress backups to protect their websites.',
+                    'transients-manager'
+                ),
+                'iconUrl' => AM_TM_PLUGIN_URL . '/assets/img/duplicator-icon.svg',
+                'pro'     => false,
+                'isPro'   => true,
             ],
         ];
 
@@ -391,7 +405,7 @@ class CrossPromotion
      *
      * @param string $slug Plugin slug
      *
-     * @return array{name:string,slug:string,url:string,desc:string}|false Plugin info or false if not found
+     * @return array{name:string,url:string,desc:string,iconUrl:string,pro:mixed,isPro:bool}|false Plugin info or false if not found
      */
     protected static function getPluginBySlug($slug)
     {

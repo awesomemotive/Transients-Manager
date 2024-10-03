@@ -9,7 +9,7 @@ Tags:              cron, tool, transient
 Requires PHP:      5.6.20
 Requires at least: 5.3
 Tested up to:      6.5
-Stable Tag:        2.0.5
+Stable Tag:        2.0.6
 
 Provides a familiar interface to view, search, edit, and delete Transients.
 

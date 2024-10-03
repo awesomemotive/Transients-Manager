@@ -2,6 +2,9 @@
 
 namespace AM\TransientsManager;
 
+/**
+ * Transients Manager class
+ */
 class TransientsManager {
 
     /** @var ?self */
