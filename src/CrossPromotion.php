@@ -237,7 +237,7 @@ class CrossPromotion
             .cross-promotion {
                 display: flex;
                 flex-direction: column;
-                align-items: center;
+                align-items: start;
                 border-left-width: 1px;
                 padding: 20px 20px 30px 20px;
             }
@@ -245,6 +245,7 @@ class CrossPromotion
             .cross-promotion .intro-text {
                 font-size: 14px;
                 align-self: flex-start;
+                margin-bottom: 15px;
             }
 
             .cross-promotion-plugin {
@@ -252,7 +253,7 @@ class CrossPromotion
                 flex-direction: row;
                 align-items: center;
                 justify-content: center;
-                max-width: 800px;
+                max-width: 1000px;
             }
 
             .cross-promotion-plugin img {
