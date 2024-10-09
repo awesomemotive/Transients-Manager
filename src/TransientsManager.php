@@ -119,7 +119,7 @@ class TransientsManager {
      * @since 2.0
      */
     public function init() {
-        add_action( 'plugins_loaded',    array( $this, 'text_domain' ) );
+        add_action( 'after_setup_theme', array( $this, 'text_domain' ) );
         add_action( 'admin_init',        array( $this, 'set_vars' ) );
         add_action( 'admin_init',        array( $this, 'process_actions' ) );
         add_action( 'admin_menu',        array( $this, 'tools_link' ) );
