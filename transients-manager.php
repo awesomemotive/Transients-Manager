@@ -11,7 +11,7 @@
  * Text Domain:       transients-manager
  * Requires PHP:      5.6.20
  * Requires at least: 5.3
- * Version:           2.0.6
+ * Version:           2.0.7
  */
 
 // Exit if accessed directly
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 require_once( dirname( __FILE__ ) . '/src/TransientsManager.php' );
 require_once( dirname( __FILE__ ) . '/src/CrossPromotion.php' );
 
-define( 'AM_TM_VERSION', '2.0.6' );
+define( 'AM_TM_VERSION', '2.0.7' );
 define( 'AM_TM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 \AM\TransientsManager\TransientsManager::getInstance()->init();
