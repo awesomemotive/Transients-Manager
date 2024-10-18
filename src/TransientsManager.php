@@ -1007,7 +1007,7 @@ class TransientsManager {
         }
 
         // Bail if nonce fails
-        if ( ! empty( $_REQUEST['_wpnonce'] ) && ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'transients_manager' ) ) {
+        if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'transients_manager' ) ) {
             return;
         }
 
